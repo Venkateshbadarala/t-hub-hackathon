@@ -7,6 +7,7 @@ import { doc, setDoc } from "firebase/firestore";
 import { db } from '../../firebase-config';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import pic2 from './pic2.png'
 import {
  
   HStack,
@@ -59,17 +60,20 @@ const RegisterForm = () => {
   return (
     <div className="flex min-h-screen">
       <div className="flex-col items-center justify-center hidden w-1/2 text-white md:flex bg-gradient-to-br from-purple-700 to-indigo-500">
-        <h1 className="mb-4 text-5xl font-bold">Emo-Diary</h1>
-        <p className="mb-6 text-lg">Journal for mental wellness</p>
-        <div className="mt-6">
-          <p>Helping for mental wellness  </p>
+      <div>
+        <img src={pic2} alt="pic2" />
+      </div>
+        <h1 className="mb-4 text-5xl font-extrabold text-white libre-baskerville-regular-italic">Emo-Diary</h1>
+        <p className="mb-6 text-lg text-white libre-baskerville-regular-italic">Journal for mental wellness</p>
+        <div className="mt-1">
+          <p className='text-white libre-baskerville-regular-italic'>Helping for mental wellness  </p>
         </div>
       </div>
 
       <div className="flex flex-col items-center justify-center w-full px-6 py-10 bg-gray-100 md:w-1/2">
         <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
-          <h2 className="mb-6 text-3xl font-bold text-center">Register</h2>
-          <form onSubmit={handleSubmit(handleRegister)} className="flex flex-col gap-5">
+          <h2 className="mb-6 text-3xl font-bold text-center text-black">Register</h2>
+          <form onSubmit={handleSubmit(handleRegister)} className="flex flex-col gap-5 text-black">
             {/* Username */}
             <div className="grid gap-1.5">
               <label htmlFor="name" className="text-base font-semibold">Username</label>

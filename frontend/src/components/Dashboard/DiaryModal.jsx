@@ -1,97 +1,69 @@
+// DiaryModal.js
 import React from 'react';
 import {
   Modal,
   ModalOverlay,
   ModalContent,
   ModalHeader,
+  ModalCloseButton,
   ModalBody,
   ModalFooter,
   Button,
-  Image,
   Text,
   Box,
 } from '@chakra-ui/react';
 
 const DiaryModal = ({ diary, isOpen, onClose }) => {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} >
+    <Modal isOpen={isOpen} onClose={onClose} size="lg">
       <ModalOverlay />
       <ModalContent
-        className="transition-all duration-300 transform "
-        background='#708090'
-        boxShadow="xl"
-        
+        borderRadius="md"   // Rounded corners
+        boxShadow="xl"      // Shadow effect
       >
-        <ModalHeader
-          color="white"
-          fontSize="2xl"
-          textAlign="center"
-          fontWeight="bold"
-         
-          py={4}
-       
-        >
-          Diary Entry
+        <ModalHeader textAlign="center" fontWeight="bold" fontSize="2xl" borderBottomWidth={1}>
+          {diary.title}
         </ModalHeader>
-
-        <ModalBody p={6} bg="white" >
-          {/* Title */}
-          <Box mb={2}>
-            <Text fontWeight="bold" fontSize="md" color="gray.600">
+        <ModalCloseButton color="red.500" />
+        <ModalBody padding={6}>
+          <Box 
+            borderRadius="md"
+            padding={4}
+            boxShadow="base" // Subtle shadow for the content box
+          >
+            {/* Title Section */}
+            <Text fontSize="lg" fontWeight="bold" color="gray.800" mb={2}>
               Title:
             </Text>
-            <Text
-              fontSize="lg"
-              fontWeight="semibold"
-              color="gray.700"
-              textAlign="justify"
-            >
+            <Text fontSize="lg" lineHeight="tall" color="gray.700" mb={4}>
               {diary.title}
             </Text>
-          </Box>
-
-          {/* Content */}
-          <Box mb={4}>
-            <Text fontWeight="bold" fontSize="md" color="gray.600">
+            
+            {/* Content Section */}
+            <Text fontSize="lg" fontWeight="bold" color="gray.800" mb={2}>
               Content:
             </Text>
-            <Text
-              fontSize="lg"
-              fontWeight="semibold"
-              color="gray.700"
-              textAlign="justify"
-            >
+            <Text fontSize="lg" lineHeight="tall" color="gray.700" mb={4}>
               {diary.content}
             </Text>
+            
+            {/* Date Section */}
+            <Text fontSize="lg" fontWeight="bold" color="gray.800" mb={2}>
+              Date:
+            </Text>
+            <Text fontSize="sm" color="gray.500">
+              {diary.date.toLocaleDateString()}
+            </Text>
           </Box>
-
-          {/* Image */}
-          {diary.imageUrl && (
-            <Image
-              src={diary.imageUrl}
-              alt={diary.title}
-              boxShadow="lg"
-              borderRadius="md"
-              mb={4}
-              className="object-cover w-full h-40"
-            />
-          )}
-
-          {/* Audio */}
-          {diary.audioUrl && (
-            <audio controls className="w-full mt-2">
-              <source src={diary.audioUrl} type="audio/mpeg" />
-              Your browser does not support the audio tag.
-            </audio>
-          )}
         </ModalBody>
-
-        <ModalFooter bg="gray.100" borderBottomRadius="lg">
-          <Button
-            colorScheme="blue"
-            size="md"
-            onClick={onClose}
-            className="transition-transform hover:scale-105"
+        <ModalFooter justifyContent="center">
+          <Button 
+            colorScheme="blue" 
+            onClick={onClose} 
+            variant="solid" 
+            size="lg" 
+            borderRadius="md" 
+            paddingX={8}
           >
             Close
           </Button>

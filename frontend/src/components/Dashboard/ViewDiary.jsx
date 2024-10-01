@@ -4,7 +4,7 @@ import { auth, db } from '../../firebase-config';
 import { collection, query, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { Button, Spinner, Alert, AlertIcon, AlertTitle, AlertDescription } from '@chakra-ui/react';
 import DiaryList from './DiaryList';
-import DiaryModal from './DiaryModal';
+import DiaryModal from './DiaryModal'; 
 import { motion } from 'framer-motion';
 
 const ViewDiaries = ({ selectedDate }) => {
@@ -13,7 +13,7 @@ const ViewDiaries = ({ selectedDate }) => {
   const [selectedDiary, setSelectedDiary] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [showFullHistory, setShowFullHistory] = useState(false);
+  const [showFullHistory, setShowFullHistory] = useState(true);
   const user = auth.currentUser;
 
   useEffect(() => {
@@ -92,13 +92,11 @@ const ViewDiaries = ({ selectedDate }) => {
   };
 
   return (
-    <div className="max-w-6xl p-6 mx-auto">
+    <div className="fixed flex flex-col items-center justify-center p-6 ">
       <h2 className="mb-6 font-serif text-3xl font-extrabold text-center text-white">E-Diaries List</h2>
 
       <div className="flex justify-center mb-6">
-        <motion.div
-         className='flex gap-6'
-        >
+        <motion.div className='flex gap-6'>
           <Button colorScheme="blue" onClick={() => setShowFullHistory(false)} className='font-serif'>
             View Selected Date
           </Button>

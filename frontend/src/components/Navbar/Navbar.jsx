@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
-import { Link } from 'react-router-dom'; // For routing
+import { Link } from 'react-router-dom';
 import AccountImage from './AccountImage';
-import { FaFire, FaHeart } from 'react-icons/fa'; // Icons
+import { FaFire, FaHeart } from 'react-icons/fa';
 import { auth, db } from '../../firebase-config';
 import { collection, query, onSnapshot } from 'firebase/firestore';
 import { Tooltip } from '@chakra-ui/react';
 import { RiTeamFill } from 'react-icons/ri';
 import { IoHomeSharp } from 'react-icons/io5';
-import AddDiary from '../Dashboard/AddDiary'; // Component for adding diaries
-
+import AddDiary from '../Dashboard/AddDiary';
+import logo from './e-diarylogo.png'
 const NavbarRoutes = [
   {
     id: 1,
@@ -108,54 +108,53 @@ const Navbar = () => {
       }}
       animate={hidden ? 'hidden' : 'visible'}
       transition={{ duration: 0.3, ease: 'easeInOut' }}
-      className="fixed top-0 left-0 right-0 z-50"
+      className="fixed top-0 left-0 right-0 z-50 text-white bg-black shadow-lg"
     >
-      <div className="flex flex-col px-6 py-2 transition-colors duration-300 bg-black rounded-b-lg shadow-md">
-        <div className="flex items-center justify-between">
-          <h1 className="ml-10 font-serif text-2xl font-extrabold text-white">
-            Emo-Diary
-          </h1>
+      <div className="flex items-center justify-between px-8 py-3">
+     
+          <img src={logo} alt="logo" className='w-[10rem]' />
+       
 
-          <nav className="flex flex-row items-center justify-center gap-10 font-bold text-[18px]">
-            {NavbarRoutes.map((route) => (
-              <Link
-                key={route.id}
-                to={route.route}
-                className="flex items-center p-2 my-1 text-white rounded-md hover:bg-gray-700"
-              >
-                <span className="mr-2">{route.icon}</span>
-                <span>{route.name}</span>
-              </Link>
-            ))}
-          </nav>
-
-          <div>
-            <AddDiary />
-          </div>
-
-          <div className="flex items-center space-x-6 text-white">
-            {/* Display posts count or error */}
-            <Tooltip
-              label={
-                loading
-                  ? 'Loading posts...'
-                  : error
-                  ? error
-                  : `${postsCount} ${postsCount === 1 ? 'Post' : 'Posts'}`
-              }
-              aria-label="Posts Count Tooltip"
+        {/* Navigation Links */}
+        <nav className="flex space-x-8 ">
+          {NavbarRoutes.map((route) => (
+            <Link
+              key={route.id}
+              to={route.route}
+              className="flex items-center font-bold  transition duration-300 hover:text-indigo-300 text-[18px]"
             >
-              <div className="flex items-center text-gray-700 cursor-pointer dark:text-gray-200">
-                <FaFire className="mr-1 text-yellow-500" size={20} />
-                <span className="text-lg text-white">
-                  {loading ? '...' : error ? '!' : postsCount}
-                </span>
-              </div>
-            </Tooltip>
+              <span className="mr-2">{route.icon}</span>
+              <span>{route.name}</span>
+            </Link>
+          ))}
+        </nav>
 
-            {/* Account image */}
-            <AccountImage />
-          </div>
+        {/* Right Section: AddDiary, Posts Count, and Account */}
+        <div className="flex items-center space-x-6">
+          {/* Add Diary Button */}
+          <AddDiary />
+
+          {/* Tooltip for Posts Count */}
+          <Tooltip
+            label={
+              loading
+                ? 'Loading posts...'
+                : error
+                ? error
+                : `${postsCount} ${postsCount === 1 ? 'Post' : 'Posts'}`
+            }
+            aria-label="Posts Count Tooltip"
+          >
+            <div className="flex items-center text-white cursor-pointer">
+              <FaFire className="mr-1 text-yellow-500" size={20} />
+              <span className="text-lg">
+                {loading ? '...' : error ? '!' : postsCount}
+              </span>
+            </div>
+          </Tooltip>
+
+          {/* User Account Image */}
+          <AccountImage />
         </div>
       </div>
     </motion.div>
