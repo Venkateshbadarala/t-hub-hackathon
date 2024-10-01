@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useHistoryContext } from '../HistoryContext'; // Import the HistoryContext
+import { useHistoryContext } from '../../context/useHistory'; 
 import { auth, db } from '../../firebase-config';
 import { collection, query, onSnapshot } from 'firebase/firestore';
 import { Spinner, Box, Text, Heading } from '@chakra-ui/react';
 
-const ViewDiaries = () => {
-  const { showFullHistory } = useHistoryContext(); // Get context value for toggling
+const History = () => {
+  const { showFullHistory } = useHistoryContext(); 
   const [diaries, setDiaries] = useState([]);
   const [userEmail, setUserEmail] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -106,4 +106,4 @@ const ViewDiaries = () => {
   );
 };
 
-export default ViewDiaries;
+export default History;

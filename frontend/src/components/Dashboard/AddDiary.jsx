@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { auth, db, storage } from '../../firebase-config';
 import { doc, collection, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { FaMusic } from 'react-icons/fa';
 import { MdOutlineAudiotrack } from "react-icons/md";
 import { FaImage } from "react-icons/fa6";
 import { RxCross2 } from "react-icons/rx";
@@ -138,7 +137,7 @@ const AddDiary = () => {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 required
-                className="w-3/4 p-2 text-center border rounded-md outline-none"
+                className="w-3/4 p-2 font-bold text-center border rounded-md outline-none"
               />
 
               <textarea
