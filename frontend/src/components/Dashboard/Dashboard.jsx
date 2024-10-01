@@ -11,13 +11,11 @@ const Dashboard = () => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
- 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       setUser(storedUser);
     } else {
-     
       const unsubscribe = auth.onAuthStateChanged((currentUser) => {
         if (currentUser) {
           setUser(currentUser.email);
@@ -30,11 +28,9 @@ const Dashboard = () => {
     }
   }, [navigate]);
 
-
   useEffect(() => {
     console.log('Selected date changed:', selectedDate);
   }, [selectedDate]);
-
 
   if (!user) {
     return null; 
@@ -42,7 +38,7 @@ const Dashboard = () => {
 
   return (
     <div className="p-6">
-      
+      <h1 className="mb-4 text-2xl font-bold">Welcome to your Dashboard</h1>
       <DiaryCalendar onDateChange={setSelectedDate} />
       <ViewDiaries selectedDate={selectedDate} />
       <AddDiary />
