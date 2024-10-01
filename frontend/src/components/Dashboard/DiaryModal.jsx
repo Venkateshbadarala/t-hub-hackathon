@@ -84,26 +84,19 @@ const DiaryModal = ({
               <Text>{selectedDiary.content}</Text>
               {selectedDiary.imageUrl && (
                 <Image
-                  src={diary.imageUrl}
-                  alt={diary.title}
-                  className='object-cover w-full h-40 mt-2 rounded-lg'
+                  src={selectedDiary.imageUrl}
+                  alt={selectedDiary.title}
+                  className="object-cover w-full h-40 mt-2 rounded-lg"
                 />
-              </div>
-            )
+              )}
+              {selectedDiary.audioUrl && (
+                <audio controls className="w-full mt-2">
+                  <source src={selectedDiary.audioUrl} type="audio/mpeg" />
+                  Your browser does not support the audio tag.
+                </audio>
+              )}
+            </>
           )}
-
-          <FormControl mt={4}>
-            <FormLabel>Content</FormLabel>
-            <Textarea
-              value={editMode ? editDiary.content : diary.content}
-              onChange={(e) =>
-                setEditDiary((prev) => ({ ...prev, content: e.target.value }))
-              }
-              placeholder='Content'
-              size='lg'
-              isReadOnly={!editMode}
-            />
-          </FormControl>
         </ModalBody>
         <ModalFooter>
           {editMode ? (
