@@ -11,7 +11,6 @@ const DiaryCalendar = ({ onDateChange }) => {
     setDate(newDate);
     onDateChange(newDate);
     const formattedDate = newDate.toISOString().split('T')[0];
-    toast.success(`Date selected: ${formattedDate}`);
   };
 
   return (

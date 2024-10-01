@@ -16,8 +16,8 @@ import {
   ModalFooter,
   Button,
   Text,
-  Input,
-  Textarea,
+  // Input,
+  // Textarea,
   Image,
   FormControl,
   FormLabel,
@@ -27,16 +27,16 @@ import {
   AlertTitle,
   AlertDescription,
 } from '@chakra-ui/react';
-import { FaEdit, FaHeart, FaRegHeart } from 'react-icons/fa';
+import { FaHeart, FaRegHeart } from 'react-icons/fa'; // Removed FaEdit
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 
 const ViewDiaries = ({ selectedDate }) => {
   const [diaries, setDiaries] = useState([]);
   const [allDiaries, setAllDiaries] = useState([]);
   const [selectedDiary, setSelectedDiary] = useState(null);
-  const [editMode, setEditMode] = useState(false);
-  const [editDiary, setEditDiary] = useState({ title: '', content: '' });
-  const [newImage, setNewImage] = useState(null);
+  // const [editMode, setEditMode] = useState(false);
+  // const [editDiary, setEditDiary] = useState({ title: '', content: '' });
+  // const [newImage, setNewImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showFullHistory, setShowFullHistory] = useState(false); // Toggle for history view
@@ -48,7 +48,7 @@ const ViewDiaries = ({ selectedDate }) => {
         setLoading(true);
         setError(null);
         try {
-          const userDocRef = doc(db, 'users', user.email);
+          const userDocRef = doc(db, 'users', user.uid);
           const diaryCollectionRef = collection(userDocRef, 'diaries');
           const q = query(diaryCollectionRef);
           const querySnapshot = await getDocs(q);
@@ -93,72 +93,74 @@ const ViewDiaries = ({ selectedDate }) => {
 
   const handleCardClick = (diary) => {
     setSelectedDiary(diary);
-    setEditMode(false);
-    setNewImage(null);
+    // setEditMode(false);
+    // setNewImage(null);
   };
 
   const closeModal = () => {
     setSelectedDiary(null);
-    setEditMode(false);
-    setNewImage(null);
+    // setEditMode(false);
+    // setNewImage(null);
   };
 
-  const handleEditClick = (diary) => {
-    setEditDiary({ title: diary.title, content: diary.content });
-    setEditMode(true);
-    setSelectedDiary(diary);
-    setNewImage(null);
-  };
+  // Comment out the handleEditClick function
+  // const handleEditClick = (diary) => {
+  //   setEditDiary({ title: diary.title, content: diary.content });
+  //   setEditMode(true);
+  //   setSelectedDiary(diary);
+  //   setNewImage(null);
+  // };
 
-  const handleSaveEdit = async () => {
-    if (!selectedDiary) return;
+  // Comment out the handleSaveEdit function
+  // const handleSaveEdit = async () => {
+  //   if (!selectedDiary) return;
 
-    try {
-      const userDocRef = doc(db, 'users', user.email);
-      const diaryDocRef = doc(userDocRef, 'diaries', selectedDiary.id);
+  //   try {
+  //     const userDocRef = doc(db, 'users', user.email);
+  //     const diaryDocRef = doc(userDocRef, 'diaries', selectedDiary.id);
 
-      let updatedData = {
-        title: editDiary.title,
-        content: editDiary.content,
-      };
+  //     let updatedData = {
+  //       title: editDiary.title,
+  //       content: editDiary.content,
+  //     };
 
-      if (selectedDiary.imageUrl && !newImage && editDiary.removeImage) {
-        const imageRef = ref(storage, selectedDiary.imageUrl);
-        await deleteObject(imageRef);
-        updatedData.imageUrl = null;
-      }
+  //     if (selectedDiary.imageUrl && !newImage && editDiary.removeImage) {
+  //       const imageRef = ref(storage, selectedDiary.imageUrl);
+  //       await deleteObject(imageRef);
+  //       updatedData.imageUrl = null;
+  //     }
 
-      if (newImage) {
-        const imageRef = ref(storage, `users/${user.email}/diaries/${selectedDiary.id}/${newImage.name}`);
-        const snapshot = await uploadBytes(imageRef, newImage);
-        const downloadURL = await getDownloadURL(snapshot.ref);
-        updatedData.imageUrl = downloadURL;
+  //     if (newImage) {
+  //       const imageRef = ref(storage, `users/${user.email}/diaries/${selectedDiary.id}/${newImage.name}`);
+  //       const snapshot = await uploadBytes(imageRef, newImage);
+  //       const downloadURL = await getDownloadURL(snapshot.ref);
+  //       updatedData.imageUrl = downloadURL;
 
-        if (selectedDiary.imageUrl) {
-          const oldImageRef = ref(storage, selectedDiary.imageUrl);
-          await deleteObject(oldImageRef);
-        }
-      }
+  //       if (selectedDiary.imageUrl) {
+  //         const oldImageRef = ref(storage, selectedDiary.imageUrl);
+  //         await deleteObject(oldImageRef);
+  //       }
+  //     }
 
-      updatedData.imageUrl = updatedData.imageUrl !== undefined ? updatedData.imageUrl : selectedDiary.imageUrl;
-      updatedData.audioUrl = selectedDiary.audioUrl || null;
+  //     updatedData.imageUrl = updatedData.imageUrl !== undefined ? updatedData.imageUrl : selectedDiary.imageUrl;
+  //     updatedData.audioUrl = selectedDiary.audioUrl || null;
 
-      await updateDoc(diaryDocRef, updatedData);
+  //     await updateDoc(diaryDocRef, updatedData);
 
-      const updatedDiaries = allDiaries.map((diary) =>
-        diary.id === selectedDiary.id
-          ? { ...diary, ...updatedData }
-          : diary
-      );
-      setDiaries(updatedDiaries);
-      setAllDiaries(updatedDiaries);
+  //     const updatedDiaries = allDiaries.map((diary) =>
+  //       diary.id === selectedDiary.id
+  //         ? { ...diary, ...updatedData }
+  //         : diary
+  //     );
+  //     setDiaries(updatedDiaries);
+  //     setAllDiaries(updatedDiaries);
 
-      closeModal();
-    } catch (error) {
-      console.error('Error updating diary:', error.message);
-      setError('Failed to update diary. Please try again.');
-    }
-  };
+  //     closeModal();
+  //   } catch (error) {
+  //     console.error('Error updating diary:', error.message);
+  //     setError('Failed to update diary. Please try again.');
+  //   }
+  // };
 
   const handleLikeClick = async (diary) => {
     const userDocRef = doc(db, 'users', user.email);
@@ -183,17 +185,18 @@ const ViewDiaries = ({ selectedDate }) => {
     }
   };
 
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setNewImage(e.target.files[0]);
-      setEditDiary((prev) => ({ ...prev, removeImage: false }));
-    }
-  };
+  // Comment out the handleImageChange and handleRemoveImage functions
+  // const handleImageChange = (e) => {
+  //   if (e.target.files[0]) {
+  //     setNewImage(e.target.files[0]);
+  //     setEditDiary((prev) => ({ ...prev, removeImage: false }));
+  //   }
+  // };
 
-  const handleRemoveImage = () => {
-    setEditDiary((prev) => ({ ...prev, removeImage: true }));
-    setNewImage(null);
-  };
+  // const handleRemoveImage = () => {
+  //   setEditDiary((prev) => ({ ...prev, removeImage: true }));
+  //   setNewImage(null);
+  // };
 
   return (
     <div className="max-w-6xl p-6 mx-auto">
@@ -249,17 +252,7 @@ const ViewDiaries = ({ selectedDate }) => {
               <Text className="mt-4 text-gray-700 truncate">{diary.content}</Text>
 
               <div className="flex justify-between mt-4">
-                <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleEditClick(diary);
-                  }}
-                  colorScheme="blue"
-                  variant="outline"
-                  leftIcon={<FaEdit />}
-                >
-                  Edit
-                </Button>
+                {/* Removed edit button */}
                 <Button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -282,87 +275,24 @@ const ViewDiaries = ({ selectedDate }) => {
         <Modal isOpen={Boolean(selectedDiary)} onClose={closeModal}>
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>{editMode ? 'Edit Diary' : selectedDiary.title}</ModalHeader>
+            <ModalHeader>{selectedDiary.title}</ModalHeader>
             <ModalBody>
-              {editMode ? (
-                <FormControl>
-                  <FormLabel>Title</FormLabel>
-                  <Input
-                    value={editDiary.title}
-                    onChange={(e) =>
-                      setEditDiary((prev) => ({ ...prev, title: e.target.value }))
-                    }
-                    mb={4}
-                  />
-                  <FormLabel>Content</FormLabel>
-                  <Textarea
-                    value={editDiary.content}
-                    onChange={(e) =>
-                      setEditDiary((prev) => ({ ...prev, content: e.target.value }))
-                    }
-                    mb={4}
-                  />
-                  <FormLabel>Image</FormLabel>
-                  {selectedDiary.imageUrl && !editDiary.removeImage && (
-                    <Image
-                      src={selectedDiary.imageUrl}
-                      alt="Current Image"
-                      className="object-cover w-full h-40 mt-2 rounded-lg"
-                      mb={4}
-                    />
-                  )}
-                  {newImage ? (
-                    <p>{newImage.name}</p>
-                  ) : (
-                    <>
-                      <Input type="file" accept="image/*" onChange={handleImageChange} />
-                      {selectedDiary.imageUrl && !editDiary.removeImage && (
-                        <Button
-                          colorScheme="red"
-                          variant="outline"
-                          mt={2}
-                          onClick={handleRemoveImage}
-                        >
-                          Remove Image
-                        </Button>
-                      )}
-                    </>
-                  )}
-                </FormControl>
-              ) : (
-                <>
-                  <Text>{selectedDiary.content}</Text>
-                  {selectedDiary.imageUrl && (
-                    <Image
-                      src={selectedDiary.imageUrl}
-                      alt={selectedDiary.title}
-                      className="object-cover w-full h-40 mt-2 rounded-lg"
-                    />
-                  )}
-                  {selectedDiary.audioUrl && (
-                    <audio controls className="w-full mt-2">
-                      <source src={selectedDiary.audioUrl} type="audio/mpeg" />
-                      Your browser does not support the audio tag.
-                    </audio>
-                  )}
-                </>
+              <Text>{selectedDiary.content}</Text>
+              {selectedDiary.imageUrl && (
+                <Image
+                  src={selectedDiary.imageUrl}
+                  alt={selectedDiary.title}
+                  className="object-cover w-full h-40 mt-2 rounded-lg"
+                />
+              )}
+              {selectedDiary.audioUrl && (
+                <audio controls className="w-full mt-2">
+                  <source src={selectedDiary.audioUrl} type="audio/mpeg" />
+                  Your browser does not support the audio tag.
+                </audio>
               )}
             </ModalBody>
             <ModalFooter>
-              {editMode ? (
-                <>
-                  <Button colorScheme="blue" mr={3} onClick={handleSaveEdit}>
-                    Save
-                  </Button>
-                  <Button variant="ghost" onClick={closeModal}>
-                    Cancel
-                  </Button>
-                </>
-              ) : (
-                <Button colorScheme="blue" mr={3} onClick={() => handleEditClick(selectedDiary)}>
-                  Edit
-                </Button>
-              )}
               <Button variant="ghost" onClick={closeModal}>
                 Close
               </Button>
