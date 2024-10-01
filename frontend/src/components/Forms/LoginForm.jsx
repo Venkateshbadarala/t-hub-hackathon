@@ -3,91 +3,189 @@ import { useForm } from 'react-hook-form';
 import { auth } from '../../firebase-config';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { ToastContainer, toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate, Link as RouterLink } from 'react-router-dom'; 
 import 'react-toastify/dist/ReactToastify.css';
 import LoginProvider from './LoginProvider';
+import {
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  FormErrorMessage,
+  Heading,
+  VStack,
+  HStack,
+  Divider,
+  Text,
+  Link as ChakraLink,
+  Spinner,
+  Flex,
+} from '@chakra-ui/react';
 
 const LoginForm = () => {
   const [loading, setLoading] = useState(false);
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
     defaultValues: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
     },
   });
 
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const handleLogin = async (data) => {
     try {
       setLoading(true);
       await signInWithEmailAndPassword(auth, data.email, data.password);
-      toast.success("Login successful");
-      navigate('/dashboard'); 
+      toast.success('Login successful');
+      navigate('/dashboard');
     } catch (error) {
-      toast.error("Login failed: " + error.message);
+      toast.error('Login failed: ' + error.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-3xl font-bold text-center mb-6">Login</h2>
-        <form onSubmit={handleSubmit(handleLogin)} className='flex flex-col gap-6'>
-          <div className="grid gap-1.5">
-            <label htmlFor="email" className='text-base font-semibold'>Email</label>
-            <input
-              type="email"
-              id="email"
-              placeholder="Example@gmail.com"
-              {...register("email", {
-                required: "Email is required",
-                pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: "Invalid email address",
-                },
-              })}
-              className='h-12 px-3 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200'
-            />
-            {errors.email && <p className="text-red-500">{errors.email.message}</p>}
-          </div>
-          <div className="grid gap-1.5">
-            <label htmlFor="password" className='text-base font-semibold'>Password</label>
-            <input
-              type="password"
-              id="password"
-              placeholder="********"
-              {...register("password", {
-                required: "Password is required",
-                minLength: {
-                  value: 8,
-                  message: "Password must be at least 8 characters long",
-                },
-              })}
-              className='h-12 px-3 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200'
-            />
-            {errors.password && <p className="text-red-500">{errors.password.message}</p>}
-            <a href="/forgot" className="text-sm text-blue-600 hover:underline mt-1">Forgot Password?</a>
-          </div>
-          <button
-            type='submit'
-            className='w-full h-12 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition duration-300'
-            disabled={loading}
-          >
-            {loading ? "Loading..." : "Login"}
-          </button>
-        </form>
-        <div className="flex items-center justify-center mt-4">
-          <hr className="w-1/3" />
-          <span className="mx-4 text-gray-600">or</span>
-          <hr className="w-1/3" />
-        </div>
-        <LoginProvider />
-        <ToastContainer />
-      </div>
-    </div>
+    <Box
+      display="flex"
+      minHeight="100vh"
+      bgGradient="linear(to-r, #3b206a, #5d3a90)"
+      px={4}
+    >
+      {/* Left Side: Illustration */}
+      <Flex
+        direction="column"
+        justifyContent="center"
+        alignItems="center"
+        width="50%"
+        bg="transparent"
+        color="white"
+      >
+        {/* Replace this Box with actual SVG illustrations */}
+        <Heading size="lg" mb={4}>
+          Emo-Diary 
+        </Heading>
+        <Text fontSize="lg" mb={6}>
+          Welcome to your personal mental wellness
+        </Text>
+       
+        <Box mt={6}>
+          <Text fontSize="md" textAlign="center">
+          
+          </Text>
+        </Box>
+      </Flex>
+
+      {/* Right Side: Login Form */}
+      <Flex
+        alignItems="center"
+        justifyContent="center"
+        width="50%"
+        bg="white"
+        borderRadius="lg"
+        p={8}
+        shadow="lg"
+      >
+        <Box width="100%" maxW="md">
+          <Heading as="h2" size="xl" textAlign="center" mb={6}>
+            Welcome Back...
+          </Heading>
+          <form onSubmit={handleSubmit(handleLogin)}>
+            <VStack spacing={4}>
+              {/* Email Field */}
+              <FormControl isInvalid={errors.email}>
+                <FormLabel htmlFor="email">Email</FormLabel>
+                <Input
+                  type="email"
+                  id="email"
+                  placeholder="user@gmail.com"
+                  {...register('email', {
+                    required: 'Email is required',
+                    pattern: {
+                      value:
+                        /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: 'Invalid email address',
+                    },
+                  })}
+                />
+                <FormErrorMessage>
+                  {errors.email && errors.email.message}
+                </FormErrorMessage>
+              </FormControl>
+
+              {/* Password Field */}
+              <FormControl isInvalid={errors.password}>
+                <FormLabel htmlFor="password">Password</FormLabel>
+                <Input
+                  type="password"
+                  id="password"
+                  placeholder="********"
+                  {...register('password', {
+                    required: 'Password is required',
+                    minLength: {
+                      value: 8,
+                      message: 'Password must be at least 8 characters long',
+                    },
+                  })}
+                />
+                <FormErrorMessage>
+                  {errors.password && errors.password.message}
+                </FormErrorMessage>
+                <ChakraLink
+                  as={RouterLink}
+                  to="/forgot"
+                  color="blue.500"
+                  fontSize="sm"
+                  mt={1}
+                  textAlign="right"
+                  display="block"
+                >
+                  Forgot Password?
+                </ChakraLink>
+              </FormControl>
+
+              <Button 
+                type="submit"
+                colorScheme="blue"
+                className='mr-10'
+                width="82%"
+                isDisabled={loading}
+                leftIcon={loading && <Spinner size="sm" />}
+              >
+                {loading ? 'Loading...' : 'Login'}
+              </Button>
+            </VStack>
+          </form>
+
+          <HStack my={6} alignItems="center">
+            <Divider />
+            <Text fontSize="sm" color="gray.600">
+              or
+            </Text>
+            <Divider />
+          </HStack>
+
+          <LoginProvider />
+
+          <HStack my={6} alignItems="center" justifyContent="center">
+            <Text fontSize="sm" color="gray.600">
+              Don't have an account?
+            </Text>
+            <ChakraLink as={RouterLink} to="/signup" color="blue.500">
+              Create Account
+            </ChakraLink>
+          </HStack>
+
+          <ToastContainer />
+        </Box>
+      </Flex>
+    </Box>
   );
 };
 
