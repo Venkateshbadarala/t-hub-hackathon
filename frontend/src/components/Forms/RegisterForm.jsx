@@ -58,17 +58,17 @@ const RegisterForm = () => {
 
   return (
     <div className="flex min-h-screen">
-      <div className="hidden md:flex flex-col justify-center items-center w-1/2 bg-gradient-to-br from-purple-700 to-indigo-500 text-white">
-        <h1 className="text-5xl font-bold mb-4">Emo-Diary</h1>
-        <p className="text-lg mb-6">Journal for mental wellness</p>
+      <div className="flex-col items-center justify-center hidden w-1/2 text-white md:flex bg-gradient-to-br from-purple-700 to-indigo-500">
+        <h1 className="mb-4 text-5xl font-bold">Emo-Diary</h1>
+        <p className="mb-6 text-lg">Journal for mental wellness</p>
         <div className="mt-6">
           <p>Helping for mental wellness  </p>
         </div>
       </div>
 
-      <div className="flex flex-col justify-center items-center w-full md:w-1/2 bg-gray-100 px-6 py-10">
-        <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-          <h2 className="text-3xl font-bold text-center mb-6">Register</h2>
+      <div className="flex flex-col items-center justify-center w-full px-6 py-10 bg-gray-100 md:w-1/2">
+        <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
+          <h2 className="mb-6 text-3xl font-bold text-center">Register</h2>
           <form onSubmit={handleSubmit(handleRegister)} className="flex flex-col gap-5">
             {/* Username */}
             <div className="grid gap-1.5">
@@ -78,7 +78,7 @@ const RegisterForm = () => {
                 id="name"
                 placeholder="Enter your name"
                 {...register("name", { required: "Name is required" })}
-                className="h-12 px-3 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-12 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {errors.name && <p className="text-red-500">{errors.name.message}</p>}
             </div>
@@ -97,7 +97,7 @@ const RegisterForm = () => {
                     message: "Invalid email address",
                   },
                 })}
-                className="h-12 px-3 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-12 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {errors.email && <p className="text-red-500">{errors.email.message}</p>}
             </div>
@@ -115,14 +115,14 @@ const RegisterForm = () => {
                     message: "Password must be at least 8 characters long",
                   },
                 })}
-                className="h-12 px-3 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-12 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {errors.password && <p className="text-red-500">{errors.password.message}</p>}
             </div>
 
             <button
               type="submit"
-              className="w-full h-12 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-all"
+              className="w-full h-12 text-white transition-all bg-blue-600 rounded-lg hover:bg-blue-700"
               disabled={loading}
             >
               {loading ? 'Loading...' : 'Register'}
@@ -131,7 +131,7 @@ const RegisterForm = () => {
             <Text fontSize="sm" color="gray.600">
               Already have an account?
             </Text>
-            <ChakraLink as={RouterLink} to="/login" color="blue.500">
+            <ChakraLink as={RouterLink} to="/" color="blue.500">
             Login
             </ChakraLink>
           </HStack>

@@ -58,7 +58,6 @@ const LoginForm = () => {
       bgGradient="linear(to-r, #3b206a, #5d3a90)"
       px={4}
     >
-      {/* Left Side: Illustration */}
       <Flex
         direction="column"
         justifyContent="center"
@@ -67,22 +66,14 @@ const LoginForm = () => {
         bg="transparent"
         color="white"
       >
-        {/* Replace this Box with actual SVG illustrations */}
         <Heading size="lg" mb={4}>
           Emo-Diary 
         </Heading>
         <Text fontSize="lg" mb={6}>
           Welcome to your personal mental wellness
         </Text>
-       
-        <Box mt={6}>
-          <Text fontSize="md" textAlign="center">
-          
-          </Text>
-        </Box>
       </Flex>
 
-      {/* Right Side: Login Form */}
       <Flex
         alignItems="center"
         justifyContent="center"
@@ -96,8 +87,9 @@ const LoginForm = () => {
           <Heading as="h2" size="xl" textAlign="center" mb={6}>
             Welcome Back...
           </Heading>
+
           <form onSubmit={handleSubmit(handleLogin)}>
-            <VStack spacing={4}>
+            <VStack spacing={4} align="stretch" width="100%">
               {/* Email Field */}
               <FormControl isInvalid={errors.email}>
                 <FormLabel htmlFor="email">Email</FormLabel>
@@ -150,11 +142,11 @@ const LoginForm = () => {
                 </ChakraLink>
               </FormControl>
 
+              {/* Login Button */}
               <Button 
                 type="submit"
                 colorScheme="blue"
-                className='mr-10'
-                width="82%"
+                width="100%" // Full-width button
                 isDisabled={loading}
                 leftIcon={loading && <Spinner size="sm" />}
               >
@@ -163,6 +155,7 @@ const LoginForm = () => {
             </VStack>
           </form>
 
+          {/* Divider and alternative login methods */}
           <HStack my={6} alignItems="center">
             <Divider />
             <Text fontSize="sm" color="gray.600">
@@ -171,6 +164,7 @@ const LoginForm = () => {
             <Divider />
           </HStack>
 
+          {/* Other login providers */}
           <LoginProvider />
 
           <HStack my={6} alignItems="center" justifyContent="center">
