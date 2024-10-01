@@ -1,10 +1,12 @@
 import React from 'react';
 import { Spinner, Alert, AlertIcon, AlertTitle, AlertDescription, Text } from '@chakra-ui/react';
 import DiaryCard from './DiaryCard';
+import History from '../History/history';
 
 const DiaryList = ({ diaries, loading, error, handleCardClick, handleEditClick, handleLikeClick }) => {
   return (
     <>
+ 
       {loading && (
         <div className="flex items-center justify-center my-4">
           <Spinner size="xl" />

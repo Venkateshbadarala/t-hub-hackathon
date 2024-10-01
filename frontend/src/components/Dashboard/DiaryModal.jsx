@@ -131,6 +131,7 @@ const DiaryModal = ({
               placeholder='Content'
               size='lg'
               isReadOnly={!editMode}
+              className='outline-none'
             />
           </FormControl>
         </ModalBody>

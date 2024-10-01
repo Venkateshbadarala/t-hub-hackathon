@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import DiaryCalendar from './Calender';
 import AddDiary from './AddDiary';
 
+
 const Dashboard = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [user, setUser] = useState(null);
@@ -36,11 +37,18 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="p-6">
-      <h1 className="mb-4 text-2xl font-bold">Welcome to your Dashboard</h1>
-      <DiaryCalendar onDateChange={setSelectedDate} />
+    <div className="flex flex-row items-center justify-around px-[6%] py-6">
+      <div className='flex flex-col pt-[8%]'>
+      <h1 className="mb-4 text-2xl font-bold"></h1>
       <ViewDiaries selectedDate={selectedDate} />
-      <AddDiary />
+      </div>
+
+      <div>
+      <DiaryCalendar onDateChange={setSelectedDate} />
+      <AddDiary/>
+      </div>
+      
+     
     </div>
   );
 };
