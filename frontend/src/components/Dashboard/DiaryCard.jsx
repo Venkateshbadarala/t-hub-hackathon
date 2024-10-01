@@ -1,20 +1,14 @@
-// DiaryCard.js
 import React from 'react';
-import {
-  Button,
-  Text,
-  Image,
-} from '@chakra-ui/react';
-import { FaEdit, FaHeart, FaRegHeart } from 'react-icons/fa';
+import { Image, Button, Text } from '@chakra-ui/react';
+import { FaHeart, FaRegHeart } from 'react-icons/fa';
 
-const DiaryCard = ({ diary, onClick, onEditClick, onLikeClick }) => {
+const DiaryCard = ({ diary, onCardClick, onLikeClick }) => {
   return (
     <div
-      className="p-4 transition-transform transform bg-white rounded-lg shadow-md cursor-pointer hover:shadow-xl hover:scale-105"
-      onClick={onClick}
+      className="p-4 transition-transform transform bg-white rounded-lg shadow-md cursor-pointer hover:shadow-xl hover:scale-105 w-[20rem]"
+      onClick={() => onCardClick(diary)}
     >
-      <h3 className="text-2xl font-semibold text-blue-600">{diary.title}</h3>
-      <p className="text-gray-500">{diary.date.toDateString()}</p>
+      <h3 className="font-serif text-2xl font-semibold text-blue-600">{diary.title}</h3>
 
       {diary.imageUrl && (
         <Image
@@ -29,20 +23,23 @@ const DiaryCard = ({ diary, onClick, onEditClick, onLikeClick }) => {
           Your browser does not support the audio tag.
         </audio>
       )}
-      <Text className="mt-4 text-gray-700 truncate">{diary.content}</Text>
+
+      {/* Truncate content to show only two lines */}
+      <Text
+        className="mt-4 overflow-hidden text-gray-700"
+        style={{
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+        }}
+      >
+        {diary.content}
+      </Text>
 
       <div className="flex justify-between mt-4">
-        <Button
-          onClick={(e) => {
-            e.stopPropagation();
-            onEditClick(diary);
-          }}
-          colorScheme="blue"
-          variant="outline"
-          leftIcon={<FaEdit />}
-        >
-          Edit
-        </Button>
+        <p className="font-semibold text-gray-500">{diary.date.toDateString()}</p>
         <Button
           onClick={(e) => {
             e.stopPropagation();
@@ -50,9 +47,10 @@ const DiaryCard = ({ diary, onClick, onEditClick, onLikeClick }) => {
           }}
           colorScheme={diary.liked ? 'red' : 'gray'}
           leftIcon={diary.liked ? <FaHeart /> : <FaRegHeart />}
-        >
-          {diary.likes || 0}
-        </Button>
+          className='flex items-center justify-center text-center'
+        />
+          
+        
       </div>
     </div>
   );

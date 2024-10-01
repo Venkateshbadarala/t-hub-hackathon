@@ -15,11 +15,12 @@ const DiaryCalendar = ({ onDateChange }) => {
 
   return (
     <div className="flex flex-col items-center">
-      <h1 className="text-2xl font-bold mb-4">Diary Calendar</h1>
+      <h1 className="mb-4 text-2xl font-bold text-white">Diary Calendar</h1>
       <Calendar
+    
         onChange={handleDateChange}
-        value={date || new Date()} // Use new Date() only if no date is selected
-        className="mb-4"
+        value={date || new Date()}
+        className="mb-4 rounded-[5px] calender " 
       />
       <ToastContainer />
     </div>

@@ -4,6 +4,7 @@ import ViewDiaries from './ViewDiary';
 import { useNavigate } from 'react-router-dom';
 import DiaryCalendar from './Calender';
 import AddDiary from './AddDiary';
+import EmotionalGraph from './EmotionGraph';
 
 const Dashboard = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -36,15 +37,16 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="flex p-6">
-      <div className="flex-1">
-        <h1 className="text-2xl font-bold mb-4">Welcome to your Dashboard</h1>
+    <div className="flex pt-[6%] justify-around  bg-black h-[100vh]">
+      <div className="fixed left-0">
+       
         <ViewDiaries selectedDate={selectedDate} />
-        <div className=''>
-        <AddDiary /> </div>
+        
       </div>
-      <div className="flex-none ml-4"> 
+      <div className="fixed right-10"> 
         <DiaryCalendar onDateChange={setSelectedDate} />
+        <EmotionalGraph/>
+       
       </div>
     </div>
   );
