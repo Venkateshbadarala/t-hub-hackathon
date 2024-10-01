@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { auth, db, storage } from '../../firebase-config';
+
 import {
   collection,
   query,
@@ -28,6 +29,7 @@ import {
   AlertDescription,
 } from '@chakra-ui/react';
 import { FaEdit, FaHeart, FaRegHeart, FaTrash } from 'react-icons/fa';
+
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 
 const ViewDiaries = ({ selectedDate }) => {
