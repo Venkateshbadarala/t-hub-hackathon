@@ -7,6 +7,9 @@ import Dashboard from './components/Dashboard/Dashboard';
 import Navbar from './components/Navbar/Navbar';
 import Likes from './components/Dashboard/Like';
 import { HistoryProvider } from './context/useHistory';
+import PregisterForm from './components/Forms/PRegister';
+import PloginForm from './components/Forms/Plogin';
+import DoctorDashboard from './components/Dashboard/PdashBoard';
 
 const App = () => {
   return (
@@ -15,6 +18,11 @@ const App = () => {
         <div style={{ backgroundColor: 'black', minHeight: '100vh' }}> 
           <Navbar />
           <Routes>
+          <Route path="/psignup" element={<PregisterForm />} />
+          <Route path="/plogin" element={<PloginForm />} />
+
+          <Route path='/pdashboard' element={<DoctorDashboard/>}/>
+           
             <Route path="/signup" element={<Register />} />
             <Route path="/" element={<Login />} />
             <Route path="/forgot" element={<ForgotPassword />} />
