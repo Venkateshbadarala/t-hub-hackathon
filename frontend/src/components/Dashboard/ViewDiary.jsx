@@ -1,46 +1,22 @@
+// ViewDiaries.js
 import React, { useState, useEffect } from 'react';
 import { auth, db, storage } from '../../firebase-config';
-import {
-  collection,
-  query,
-  getDocs,
-  doc,
-  updateDoc,
-} from 'firebase/firestore';
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-  Text,
-  Input,
-  Textarea,
-  Image,
-  FormControl,
-  FormLabel,
-  Spinner,
-  Alert,
-  AlertIcon,
-  AlertTitle,
-  AlertDescription,
-} from '@chakra-ui/react';
-import { FaEdit, FaHeart, FaRegHeart, FaTrash } from 'react-icons/fa';
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import DiaryList from './DiaryList';
+import { collection, query, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { Button, Spinner, Alert, AlertIcon, AlertTitle, AlertDescription } from '@chakra-ui/react';
 import DiaryModal from './DiaryModal';
+import DiaryList from './DiaryList';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 
 const ViewDiaries = ({ selectedDate }) => {
   const [diaries, setDiaries] = useState([]);
   const [allDiaries, setAllDiaries] = useState([]);
   const [selectedDiary, setSelectedDiary] = useState(null);
   const [editMode, setEditMode] = useState(false);
-  const [editDiary, setEditDiary] = useState({ title: '', content: '' });
+  const [editDiary, setEditDiary] = useState({ title: '', content: '', removeImage: false });
   const [newImage, setNewImage] = useState(null);
-  const [loading, setLoading] = useState(false); // Loading state
-  const [error, setError] = useState(null); // Error state
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [showFullHistory, setShowFullHistory] = useState(false);
   const user = auth.currentUser;
 
   useEffect(() => {
@@ -75,7 +51,9 @@ const ViewDiaries = ({ selectedDate }) => {
 
   // Logic to filter by selected date or display full history
   useEffect(() => {
-    if (selectedDate) {
+    if (showFullHistory) {
+      setDiaries(allDiaries);
+    } else if (selectedDate) {
       const filtered = allDiaries.filter((diary) => {
         const diaryDate = new Date(diary.date);
         return (
@@ -85,54 +63,36 @@ const ViewDiaries = ({ selectedDate }) => {
         );
       });
       setDiaries(filtered);
-    } else {
-      setDiaries(allDiaries); // Default to all if no date is selected
     }
-  }, [selectedDate, allDiaries, showFullHistory]);
+  }, [showFullHistory, selectedDate, allDiaries]);
 
-  const handleCardClick = (diary) => {
+  const handleDiaryClick = (diary) => {
     setSelectedDiary(diary);
     setEditMode(false);
     setNewImage(null);
   };
 
   const handleEditClick = (diary) => {
+    setEditDiary({ title: diary.title, content: diary.content, removeImage: false });
     setSelectedDiary(diary);
-    setEditDiary({ title: diary.title, content: diary.content });
     setEditMode(true);
-  };
-
-  const handleLikeClick = async (diary) => {
-    try {
-      const userDocRef = doc(db, 'users', user.email);
-      const diaryRef = doc(userDocRef, 'diaries', diary.id);
-      const updatedDiary = { liked: !diary.liked, likes: diary.liked ? diary.likes - 1 : diary.likes + 1 };
-
-      await updateDoc(diaryRef, updatedDiary);
-      setDiaries((prev) =>
-        prev.map((d) =>
-          d.id === diary.id ? { ...d, liked: updatedDiary.liked, likes: updatedDiary.likes } : d
-        )
-      );
-    } catch (error) {
-      console.error('Error updating diary:', error.message);
-      setError('Failed to update diary. Please try again later.');
-    }
+    setNewImage(null);
   };
 
   const handleSaveEdit = async () => {
     if (!selectedDiary) return;
 
-    const userDocRef = doc(db, 'users', user.email);
-    const diaryRef = doc(userDocRef, 'diaries', selectedDiary.id);
-
+    setLoading(true);
+    setError(null);
+    try {
+      const diaryRef = doc(db, 'users', user.email, 'diaries', selectedDiary.id);
       let updatedData = {
         title: editDiary.title,
         content: editDiary.content,
       };
 
       // Handle image removal
-      if (selectedDiary.imageUrl && !newImage && editDiary.removeImage) {
+      if (selectedDiary.imageUrl && editDiary.removeImage) {
         const imageRef = ref(storage, selectedDiary.imageUrl);
         await deleteObject(imageRef);
         updatedData.imageUrl = null;
@@ -145,18 +105,17 @@ const ViewDiaries = ({ selectedDate }) => {
         const downloadURL = await getDownloadURL(snapshot.ref);
         updatedData.imageUrl = downloadURL;
 
-        if (selectedDiary.imageUrl) {
-          const previousImageRef = ref(storage, selectedDiary.imageUrl);
-          await deleteObject(previousImageRef);
+        // If replacing an existing image, delete the old one
+        if (selectedDiary.imageUrl && !editDiary.removeImage) {
+          const oldImageRef = ref(storage, selectedDiary.imageUrl);
+          await deleteObject(oldImageRef);
         }
       }
 
-      // Update other fields if needed (e.g., audioUrl)
-      updatedData.imageUrl = updatedData.imageUrl !== undefined ? updatedData.imageUrl : selectedDiary.imageUrl;
-      updatedData.audioUrl = selectedDiary.audioUrl || null;
+      // Update Firestore document
+      await updateDoc(diaryRef, updatedData);
 
-      await updateDoc(diaryDocRef, updatedData);
-
+      // Update local state
       const updatedDiaries = allDiaries.map((diary) =>
         diary.id === selectedDiary.id
           ? { ...diary, ...updatedData }
@@ -165,17 +124,41 @@ const ViewDiaries = ({ selectedDate }) => {
       setDiaries(updatedDiaries);
       setAllDiaries(updatedDiaries);
 
+      // Close modal and reset states
       closeModal();
     } catch (error) {
       console.error('Error updating diary:', error.message);
-      setError('Failed to update diary. Please try again later.');
+      setError('Failed to update diary. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const closeModal = () => {
-    setSelectedDiary(null);
-    setEditMode(false);
-    setNewImage(null);
+  const handleLikeClick = async (diary) => {
+    if (!user) {
+      setError('You must be logged in to like diaries.');
+      return;
+    }
+
+    const diaryRef = doc(db, 'users', user.email, 'diaries', diary.id);
+    const updatedLike = !diary.liked;
+    const updatedLikesCount = updatedLike
+      ? (diary.likes || 0) + 1
+      : (diary.likes || 0) - 1;
+
+    try {
+      await updateDoc(diaryRef, { liked: updatedLike, likes: updatedLikesCount });
+
+      // Update local state
+      const updatedDiaries = allDiaries.map((d) =>
+        d.id === diary.id ? { ...d, liked: updatedLike, likes: updatedLikesCount } : d
+      );
+      setDiaries(updatedDiaries);
+      setAllDiaries(updatedDiaries);
+    } catch (error) {
+      console.error('Error liking the diary:', error.message);
+      setError('Failed to like the diary. Please try again.');
+    }
   };
 
   const handleImageChange = (e) => {
@@ -188,14 +171,31 @@ const ViewDiaries = ({ selectedDate }) => {
 
   const handleRemoveImage = () => {
     setEditDiary((prev) => ({ ...prev, removeImage: true }));
+    setNewImage(null);
+  };
+
+  const closeModal = () => {
+    setSelectedDiary(null);
+    setEditMode(false);
+    setNewImage(null);
+    setEditDiary({ title: '', content: '', removeImage: false });
   };
 
   return (
     <div className="max-w-6xl p-6 mx-auto">
       <h2 className="mb-6 text-3xl font-bold text-center">E-Diary</h2>
 
+      <div className="flex justify-center mb-6">
+        <Button
+          colorScheme="teal"
+          onClick={() => setShowFullHistory((prev) => !prev)}
+        >
+          {showFullHistory ? 'View Selected Date' : 'View Full History'}
+        </Button>
+      </div>
+
       {loading && (
-        <div className="flex items-center justify-center my-4">
+        <div className="flex justify-center items-center my-4">
           <Spinner size="xl" />
         </div>
       )}
@@ -208,162 +208,26 @@ const ViewDiaries = ({ selectedDate }) => {
         </Alert>
       )}
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {diaries.length > 0 ? (
-          diaries.map((diary) => (
-            <div
-              key={diary.id}
-              className="p-4 transition-transform transform bg-white rounded-lg shadow-md cursor-pointer hover:shadow-xl hover:scale-105"
-              onClick={() => handleCardClick(diary)}
-            >
-              <h3 className="text-2xl font-semibold text-blue-600">{diary.title}</h3>
-              <p className="text-gray-500">{diary.date.toDateString()}</p>
-
-              {diary.imageUrl && (
-                <Image
-                  src={diary.imageUrl}
-                  alt={diary.title}
-                  className="object-cover w-full h-40 mt-2 rounded-lg"
-                />
-              )}
-              {diary.audioUrl && (
-                <audio controls className="w-full mt-2">
-                  <source src={diary.audioUrl} type="audio/mpeg" />
-                  Your browser does not support the audio tag.
-                </audio>
-              )}
-              <Text className="mt-4 text-gray-700 truncate">{diary.content}</Text>
-
-              <div className="flex justify-between mt-4">
-                <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleEditClick(diary);
-                  }}
-                  colorScheme="blue"
-                  variant="outline"
-                  leftIcon={<FaEdit />}
-                >
-                  Edit
-                </Button>
-                <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleLikeClick(diary);
-                  }}
-                  colorScheme={diary.liked ? 'red' : 'gray'}
-                  variant="outline"
-                  leftIcon={diary.liked ? <FaHeart /> : <FaRegHeart />}
-                >
-                  {diary.likes ? `${diary.likes}` : 'Like'}
-                </Button>
-              </div>
-            </div>
-          ))
-        ) : (
-          <Text textAlign="center" color="gray.500">No diaries found for the selected date.</Text>
-        )}
-      </div>
+      <DiaryList
+        diaries={diaries}
+        onDiaryClick={handleDiaryClick}
+        onEditClick={handleEditClick}
+        onLikeClick={handleLikeClick}
+      />
 
       {selectedDiary && (
-        <Modal isOpen={!!selectedDiary} onClose={closeModal} size="xl">
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>
-              {editMode ? (
-                <Input
-                  value={editDiary.title}
-                  onChange={(e) =>
-                    setEditDiary((prev) => ({ ...prev, title: e.target.value }))
-                  }
-                  variant="flushed"
-                  placeholder="Title"
-                />
-              ) : (
-                selectedDiary.title
-              )}
-            </ModalHeader>
-            <ModalBody>
-              <Text textAlign="center" color="gray.500">{selectedDiary.date.toDateString()}</Text>
-
-              {editMode ? (
-                <FormControl mt={4}>
-                  <FormLabel>Image</FormLabel>
-                  {selectedDiary.imageUrl && !newImage && !editDiary.removeImage && (
-                    <div className="flex items-center mb-2">
-                      <Image
-                        src={selectedDiary.imageUrl}
-                        alt="Current Image"
-                        boxSize="100px"
-                        objectFit="cover"
-                        mr={4}
-                      />
-                      <Button colorScheme="red" onClick={handleRemoveImage}>
-                        Remove Image
-                      </Button>
-                    </div>
-                  )}
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                  />
-                  {newImage && (
-                    <Image
-                      src={URL.createObjectURL(newImage)}
-                      alt="New Image Preview"
-                      boxSize="100px"
-                      objectFit="cover"
-                      mt={2}
-                    />
-                  )}
-                </FormControl>
-              ) : (
-                selectedDiary.imageUrl && (
-                  <Image
-                    src={selectedDiary.imageUrl}
-                    alt={selectedDiary.title}
-                    className="object-cover w-full h-40 mt-2 rounded-lg"
-                  />
-                )
-              )}
-
-              {selectedDiary.audioUrl && (
-                <audio controls className="w-full mt-2">
-                  <source src={selectedDiary.audioUrl} type="audio/mpeg" />
-                  Your browser does not support the audio tag.
-                </audio>
-              )}
-
-              <FormControl mt={4}>
-                <FormLabel>Content</FormLabel>
-                <Textarea
-                  value={editMode ? editDiary.content : selectedDiary.content}
-                  onChange={(e) =>
-                    setEditDiary((prev) => ({ ...prev, content: e.target.value }))
-                  }
-                  placeholder="Content"
-                  size="lg"
-                  isReadOnly={!editMode}
-                />
-              </FormControl>
-            </ModalBody>
-            <ModalFooter>
-              {editMode ? (
-                <>
-                  <Button colorScheme="blue" mr={3} onClick={handleSaveEdit}>
-                    Save
-                  </Button>
-                  <Button variant="ghost" onClick={closeModal}>Cancel</Button>
-                </>
-              ) : (
-                <Button colorScheme="blue" onClick={closeModal}>
-                  Close
-                </Button>
-              )}
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+        <DiaryModal
+          isOpen={Boolean(selectedDiary)}
+          onClose={closeModal}
+          selectedDiary={selectedDiary}
+          editMode={editMode}
+          editDiary={editDiary}
+          setEditDiary={setEditDiary}
+          handleSaveEdit={handleSaveEdit}
+          handleRemoveImage={handleRemoveImage}
+          newImage={newImage}
+          handleImageChange={handleImageChange}
+        />
       )}
     </div>
   );
