@@ -26,3 +26,24 @@ body {
   font-style: normal;
 }
 
+
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+
+.libre-baskerville-regular-italic {
+    font-family: "Libre Baskerville", serif;
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  /* App.css */
+
+.app-container {
+  background: rgba(0, 0, 0, 0.8); /* Full black background with transparency */
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), 
+              linear-gradient(to bottom, rgba(19, 50, 226, 0.5), rgba(69, 14, 170, 0.5)); /* Black with a gradient of blue and orange */
+  min-height: 100vh;
+  backdrop-filter: blur(100px); /* Increase blur for a more glassy effect */
+  color: white; /* Ensuring text is visible */
+  position: relative;
+}
+

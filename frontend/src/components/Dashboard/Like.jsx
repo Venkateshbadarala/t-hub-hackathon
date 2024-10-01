@@ -1,13 +1,17 @@
+// Like.js
 import React, { useEffect, useState } from 'react';
 import { auth, db } from '../../firebase-config';
-import { collection, query, getDocs, where ,doc} from 'firebase/firestore';
+import { collection, query, getDocs, where, doc } from 'firebase/firestore';
 import { Spinner, Alert, AlertIcon, AlertTitle, AlertDescription } from '@chakra-ui/react';
-import DiaryList from './DiaryList'; 
+import DiaryList from './DiaryList';
+import DiaryModal from './DiaryModal';
+import Navbar from '../Navbar/Navbar';
 
 const Like = () => {
   const [likedDiaries, setLikedDiaries] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [selectedDiary, setSelectedDiary] = useState(null);
   const user = auth.currentUser;
 
   useEffect(() => {
@@ -18,11 +22,8 @@ const Like = () => {
         try {
           const userDocRef = doc(db, 'users', user.uid);
           const diaryCollectionRef = collection(userDocRef, 'diaries');
-          
-          // Query to fetch liked diaries
           const q = query(diaryCollectionRef, where('liked', '==', true));
           const querySnapshot = await getDocs(q);
-
           const fetchedLikedDiaries = querySnapshot.docs.map((docSnap) => ({
             ...docSnap.data(),
             id: docSnap.id,
@@ -42,8 +43,14 @@ const Like = () => {
     fetchLikedDiaries();
   }, [user]);
 
+  const handleCardClick = (diary) => {
+    setSelectedDiary(diary);
+  };
+
   return (
-    <div className="max-w-6xl p-6 mx-auto pt-[6%]">
+    <>
+    <Navbar/>
+    <div className="max-w-6xl p-6 mx-auto pt-[8%]">
       <h2 className="mb-6 text-3xl font-bold text-center text-white">Liked Diaries</h2>
 
       {loading && (
@@ -60,13 +67,17 @@ const Like = () => {
         </Alert>
       )}
 
-      {/* Render the liked diaries */}
       {likedDiaries.length > 0 ? (
-        <DiaryList diaries={likedDiaries} />
+        <DiaryList diaries={likedDiaries} onCardClick={handleCardClick} />
       ) : (
         <p className="text-center text-white">No liked diaries found.</p>
       )}
+
+      {selectedDiary && (
+        <DiaryModal diary={selectedDiary} isOpen={Boolean(selectedDiary)} onClose={() => setSelectedDiary(null)} />
+      )}
     </div>
+    </>
   );
 };
 
