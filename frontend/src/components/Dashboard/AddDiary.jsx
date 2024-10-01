@@ -10,20 +10,11 @@ const AddDiary = () => {
   const [date, setDate] = useState('');
   const [image, setImage] = useState(null);
   const [audio, setAudio] = useState(null);
-  const [recordedAudio, setRecordedAudio] = useState(null);
-  const [isRecording, setIsRecording] = useState(false);
-  const [recorder, setRecorder] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
   const [audioPreview, setAudioPreview] = useState('');
 
-  // Setup MediaRecorder when the component mounts
-  useEffect(() => {
-    if (recorder === null && isRecording) {
-      requestMicrophoneAccess();
-    } else if (!isRecording && recorder) {
-      recorder.stop();
-    }
-  }, [isRecording]);
+ 
+ 
 
   useEffect(() => {
     if (image) {
@@ -37,32 +28,8 @@ const AddDiary = () => {
     }
   }, [audio]);
 
-  const requestMicrophoneAccess = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-
-      mediaRecorder.ondataavailable = (event) => {
-        setRecordedAudio(event.data);
-      };
-
-      mediaRecorder.onstop = () => {
-        stream.getTracks().forEach((track) => track.stop());
-      };
-
-      mediaRecorder.start();
-      setRecorder(mediaRecorder);
-    } catch (error) {
-      console.error('Error accessing microphone:', error.message);
-      alert('Microphone access denied. Please enable it to record audio.');
-    }
-  };
-
-  const handleRecording = () => {
-    setIsRecording((prev) => !prev);
-  };
-
-  const handleAddDiary = async () => {
+ 
+const handleAddDiary = async () => {
     try {
       const user = auth.currentUser;
       if (!user) {
@@ -87,11 +54,7 @@ const AddDiary = () => {
         audioUrl = await getDownloadURL(audioSnapshot.ref);
       }
 
-      if (recordedAudio) {
-        const recordedAudioRef = ref(storage, `diaries/${user.uid}/${date}/recorded-audio`);
-        const recordedAudioSnapshot = await uploadBytes(recordedAudioRef, recordedAudio);
-        audioUrl = await getDownloadURL(recordedAudioSnapshot.ref);
-      }
+      
 
       await setDoc(doc(diaryCollectionRef, date), {
         title,
@@ -115,7 +78,7 @@ const AddDiary = () => {
     setDate('');
     setImage(null);
     setAudio(null);
-    setRecordedAudio(null);
+   
     setImagePreview('');
     setAudioPreview('');
   };
@@ -184,13 +147,7 @@ const AddDiary = () => {
             </button>
           </div>
         )}
-        <button
-          onClick={handleRecording}
-          className={`px-4 py-2 text-white transition rounded-md ${isRecording ? 'bg-red-500' : 'bg-green-500'} hover:bg-green-700`}
-        >
-          {isRecording ? 'Stop Recording' : 'Start Recording'}
-        </button>
-        {recordedAudio && <p>Recorded Audio Ready</p>}
+        
         <button
           onClick={handleAddDiary}
           className="px-4 py-2 text-white transition bg-orange-500 rounded-md hover:bg-orange-700"
