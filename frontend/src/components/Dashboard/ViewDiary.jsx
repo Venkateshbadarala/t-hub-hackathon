@@ -261,7 +261,7 @@ const ViewDiaries = ({ selectedDate }) => {
                   variant="outline"
                   leftIcon={diary.liked ? <FaHeart /> : <FaRegHeart />}
                 >
-                  {diary.likes ? `${diary.likes}` : 'Like'}
+                  {diary.likes ? 'Unlike' : 'Like'}
                 </Button>
               </div>
             </div>
