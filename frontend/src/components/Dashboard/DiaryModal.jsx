@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import {
   Modal,
   ModalOverlay,
@@ -7,111 +7,82 @@ import {
   ModalBody,
   ModalFooter,
   Button,
+  Text,
   Input,
   Textarea,
   Image,
   FormControl,
   FormLabel,
 } from '@chakra-ui/react';
-import { RxCross2 } from 'react-icons/rx';
-import { FaImage } from 'react-icons/fa';
-import { MdOutlineAudiotrack } from 'react-icons/md';
 
 const DiaryModal = ({
   isOpen,
-  diary,
+  onClose,
+  selectedDiary,
   editMode,
   editDiary,
   setEditDiary,
+  handleSaveEdit,
+  handleRemoveImage,
   newImage,
   handleImageChange,
-  handleRemoveImage,
-  closeModal,
-  handleSaveEdit,
+  handleLikeClick, // Include handleLikeClick in props
 }) => {
-  const imageInputRef = useRef(null);
-  const audioInputRef = useRef(null);
-
   return (
-    <Modal isOpen={isOpen} onClose={closeModal} size="xl">
+    <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>
-          <h1 className='font-bold text-center'>Edit Your Content</h1>
-          {editMode ? (
-            <Input
-              value={editDiary.title}
-              onChange={(e) =>
-                setEditDiary((prev) => ({ ...prev, title: e.target.value }))
-              }
-              variant='flushed'
-              placeholder='Title'
-            />
-          ) : (
-            diary.title
-          )}
-        </ModalHeader>
+        <ModalHeader>{editMode ? 'Edit Diary' : selectedDiary.title}</ModalHeader>
         <ModalBody>
           {editMode ? (
-            <FormControl mt={4}>
+            <FormControl>
+              <FormLabel>Title</FormLabel>
+              <Input
+                value={editDiary.title}
+                onChange={(e) =>
+                  setEditDiary((prev) => ({ ...prev, title: e.target.value }))
+                }
+                mb={4}
+              />
+              <FormLabel>Content</FormLabel>
+              <Textarea
+                value={editDiary.content}
+                onChange={(e) =>
+                  setEditDiary((prev) => ({ ...prev, content: e.target.value }))
+                }
+                mb={4}
+              />
               <FormLabel>Image</FormLabel>
-              {diary.imageUrl && !newImage && !editDiary.removeImage && (
-                <div className='relative flex items-center mb-2'>
-                  <Image
-                    src={diary.imageUrl}
-                    alt='Current Image'
-                    boxSize='100px'
-                    objectFit='cover'
-                    mr={4}
-                    className='rounded-lg'
-                  />
-                  <Button
-                    onClick={handleRemoveImage}
-                    className='absolute p-1 bg-red-500 rounded-full top-1 right-1'
-                    aria-label='Remove Image'
-                  >
-                    <RxCross2 className='text-red-500' />
-                  </Button>
-                </div>
+              {selectedDiary.imageUrl && !editDiary.removeImage && (
+                <Image
+                  src={selectedDiary.imageUrl}
+                  alt="Current Image"
+                  className="object-cover w-full h-40 mt-2 rounded-lg"
+                  mb={4}
+                />
               )}
-              <div className='flex items-center gap-4'>
-                <div className='relative'>
-                  <input
-                    type='file'
-                    accept='image/*'
-                    className='hidden'
-                    ref={imageInputRef}
-                    onChange={handleImageChange}
-                  />
-                  <button
-                    onClick={() => imageInputRef.current.click()}
-                    className='p-2 bg-gray-200 rounded-md hover:bg-gray-300'
-                  >
-                    <FaImage size={24} />
-                  </button>
-                  <span className='text-sm'></span>
-                </div>
-                <div className='relative'>
-                  <input
-                    type='file'
-                    accept='audio/*'
-                    className='hidden'
-                    ref={audioInputRef}
-                    onChange={(e) => setEditDiary((prev) => ({ ...prev, audio: e.target.files[0] }))}
-                  />
-                  <button
-                    onClick={() => audioInputRef.current.click()}
-                    className='p-2 bg-gray-200 rounded-md hover:bg-gray-300'
-                  >
-                    <MdOutlineAudiotrack size={24} />
-                  </button>
-                  <span className='text-sm'></span>
-                </div>
-              </div>
+              {newImage ? (
+                <p>{newImage.name}</p>
+              ) : (
+                <>
+                  <Input type="file" accept="image/*" onChange={handleImageChange} />
+                  {selectedDiary.imageUrl && !editDiary.removeImage && (
+                    <Button
+                      colorScheme="red"
+                      variant="outline"
+                      mt={2}
+                      onClick={handleRemoveImage}
+                    >
+                      Remove Image
+                    </Button>
+                  )}
+                </>
+              )}
             </FormControl>
           ) : (
-            diary.imageUrl && (
-              <div className='relative'>
+            <>
+              <Text>{selectedDiary.content}</Text>
+              {selectedDiary.imageUrl && (
                 <Image
                   src={diary.imageUrl}
                   alt={diary.title}
@@ -131,30 +102,37 @@ const DiaryModal = ({
               placeholder='Content'
               size='lg'
               isReadOnly={!editMode}
-              className='outline-none'
             />
           </FormControl>
         </ModalBody>
         <ModalFooter>
-          <div className='flex items-center justify-between w-full'>
-            <p className='text-center text-gray-500'>{diary.date.toDateString()}</p>
-            <div>
-              {editMode ? (
-                <>
-                  <Button colorScheme='blue' mr={3} onClick={handleSaveEdit}>
-                    Save
-                  </Button>
-                  <Button variant='ghost' onClick={closeModal}>
-                    Cancel
-                  </Button>
-                </>
-              ) : (
-                <Button colorScheme='blue' onClick={closeModal}>
-                  Close
-                </Button>
-              )}
-            </div>
-          </div>
+          {editMode ? (
+            <>
+              <Button colorScheme="blue" mr={3} onClick={handleSaveEdit}>
+                Save
+              </Button>
+              <Button variant="ghost" onClick={onClose}>
+                Cancel
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                colorScheme={selectedDiary.liked ? 'red' : 'gray'}
+                variant="outline"
+                onClick={() => handleLikeClick(selectedDiary)} 
+                mr={3}
+              >
+                {selectedDiary.liked ? 'Unlike' : 'Like'}
+              </Button>
+              <Button colorScheme="blue" mr={3} onClick={onClose}>
+                Edit
+              </Button>
+            </>
+          )}
+          <Button variant="ghost" onClick={onClose}>
+            Close
+          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

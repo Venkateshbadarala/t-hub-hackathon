@@ -37,18 +37,11 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="flex flex-row items-center justify-around px-[6%] py-6">
-      <div className='flex flex-col pt-[8%]'>
-      <h1 className="mb-4 text-2xl font-bold"></h1>
-      <ViewDiaries selectedDate={selectedDate} />
-      </div>
-
-      <div>
+    <div className="p-6">
+      <h1 className="mb-4 text-2xl font-bold">Welcome to your Dashboard</h1>
       <DiaryCalendar onDateChange={setSelectedDate} />
-      <AddDiary/>
-      </div>
-      
-     
+      <ViewDiaries selectedDate={selectedDate} />
+      <AddDiary />
     </div>
   );
 };
