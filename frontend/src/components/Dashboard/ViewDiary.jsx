@@ -1,6 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { auth, db, storage } from '../../firebase-config';
-import { query, getDocs, doc, updateDoc, collection } from 'firebase/firestore';
+import {
+  collection,
+  query,
+  getDocs,
+  doc,
+  updateDoc,
+} from 'firebase/firestore';
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+  Text,
+  Input,
+  Textarea,
+  Image,
+  FormControl,
+  FormLabel,
+  Spinner,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
+} from '@chakra-ui/react';
+import { FaEdit, FaHeart, FaRegHeart, FaTrash } from 'react-icons/fa';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import DiaryList from './DiaryList';
 import DiaryModal from './DiaryModal';
@@ -12,8 +39,8 @@ const ViewDiaries = ({ selectedDate }) => {
   const [editMode, setEditMode] = useState(false);
   const [editDiary, setEditDiary] = useState({ title: '', content: '' });
   const [newImage, setNewImage] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false); // Loading state
+  const [error, setError] = useState(null); // Error state
   const user = auth.currentUser;
 
   useEffect(() => {
@@ -46,19 +73,22 @@ const ViewDiaries = ({ selectedDate }) => {
     fetchDiaries();
   }, [user]);
 
+  // Logic to filter by selected date or display full history
   useEffect(() => {
     if (selectedDate) {
-      const filteredDiaries = allDiaries.filter(
-        (diary) =>
-          diary.date.getDate() === selectedDate.getDate() &&
-          diary.date.getMonth() === selectedDate.getMonth() &&
-          diary.date.getFullYear() === selectedDate.getFullYear()
-      );
-      setDiaries(filteredDiaries);
+      const filtered = allDiaries.filter((diary) => {
+        const diaryDate = new Date(diary.date);
+        return (
+          diaryDate.getFullYear() === selectedDate.getFullYear() &&
+          diaryDate.getMonth() === selectedDate.getMonth() &&
+          diaryDate.getDate() === selectedDate.getDate()
+        );
+      });
+      setDiaries(filtered);
     } else {
-      setDiaries(allDiaries);
+      setDiaries(allDiaries); // Default to all if no date is selected
     }
-  }, [selectedDate, allDiaries]);
+  }, [selectedDate, allDiaries, showFullHistory]);
 
   const handleCardClick = (diary) => {
     setSelectedDiary(diary);
@@ -96,35 +126,46 @@ const ViewDiaries = ({ selectedDate }) => {
     const userDocRef = doc(db, 'users', user.email);
     const diaryRef = doc(userDocRef, 'diaries', selectedDiary.id);
 
-    const updatedDiary = {
-      ...editDiary,
-      imageUrl: selectedDiary.imageUrl,
-    };
+      let updatedData = {
+        title: editDiary.title,
+        content: editDiary.content,
+      };
 
-    if (newImage) {
-      try {
-        const imageRef = ref(storage, `diary-images/${user.uid}/${newImage.name}`);
-        await uploadBytes(imageRef, newImage);
-        const downloadURL = await getDownloadURL(imageRef);
-        updatedDiary.imageUrl = downloadURL;
+      // Handle image removal
+      if (selectedDiary.imageUrl && !newImage && editDiary.removeImage) {
+        const imageRef = ref(storage, selectedDiary.imageUrl);
+        await deleteObject(imageRef);
+        updatedData.imageUrl = null;
+      }
+
+      // Handle new image upload
+      if (newImage) {
+        const imageRef = ref(storage, `users/${user.email}/diaries/${selectedDiary.id}/${newImage.name}`);
+        const snapshot = await uploadBytes(imageRef, newImage);
+        const downloadURL = await getDownloadURL(snapshot.ref);
+        updatedData.imageUrl = downloadURL;
 
         if (selectedDiary.imageUrl) {
           const previousImageRef = ref(storage, selectedDiary.imageUrl);
           await deleteObject(previousImageRef);
         }
-      } catch (error) {
-        console.error('Error uploading new image:', error.message);
-        setError('Failed to upload image. Please try again later.');
-        return;
       }
-    }
 
-    try {
-      await updateDoc(diaryRef, updatedDiary);
-      setDiaries((prev) =>
-        prev.map((d) => (d.id === selectedDiary.id ? { ...d, ...updatedDiary } : d))
+      // Update other fields if needed (e.g., audioUrl)
+      updatedData.imageUrl = updatedData.imageUrl !== undefined ? updatedData.imageUrl : selectedDiary.imageUrl;
+      updatedData.audioUrl = selectedDiary.audioUrl || null;
+
+      await updateDoc(diaryDocRef, updatedData);
+
+      const updatedDiaries = allDiaries.map((diary) =>
+        diary.id === selectedDiary.id
+          ? { ...diary, ...updatedData }
+          : diary
       );
-      setSelectedDiary(null);
+      setDiaries(updatedDiaries);
+      setAllDiaries(updatedDiaries);
+
+      closeModal();
     } catch (error) {
       console.error('Error updating diary:', error.message);
       setError('Failed to update diary. Please try again later.');
@@ -138,8 +179,11 @@ const ViewDiaries = ({ selectedDate }) => {
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    setNewImage(file);
+    if (e.target.files[0]) {
+      setNewImage(e.target.files[0]);
+      // If editing, mark that the user has chosen to replace the image
+      setEditDiary((prev) => ({ ...prev, removeImage: false }));
+    }
   };
 
   const handleRemoveImage = () => {
@@ -147,30 +191,181 @@ const ViewDiaries = ({ selectedDate }) => {
   };
 
   return (
-    <>
-      <DiaryList
-        diaries={diaries}
-        loading={loading}
-        error={error}
-        handleCardClick={handleCardClick}
-        handleEditClick={handleEditClick}
-        handleLikeClick={handleLikeClick}
-      />
-      {selectedDiary && (
-        <DiaryModal
-          isOpen={!!selectedDiary}
-          diary={selectedDiary}
-          editMode={editMode}
-          editDiary={editDiary}
-          setEditDiary={setEditDiary}
-          newImage={newImage}
-          handleImageChange={handleImageChange}
-          handleRemoveImage={handleRemoveImage}
-          closeModal={closeModal}
-          handleSaveEdit={handleSaveEdit}
-        />
+    <div className="max-w-6xl p-6 mx-auto">
+      <h2 className="mb-6 text-3xl font-bold text-center">E-Diary</h2>
+
+      {loading && (
+        <div className="flex items-center justify-center my-4">
+          <Spinner size="xl" />
+        </div>
       )}
-    </>
+
+      {error && (
+        <Alert status="error" mb={4}>
+          <AlertIcon />
+          <AlertTitle mr={2}>Error!</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {diaries.length > 0 ? (
+          diaries.map((diary) => (
+            <div
+              key={diary.id}
+              className="p-4 transition-transform transform bg-white rounded-lg shadow-md cursor-pointer hover:shadow-xl hover:scale-105"
+              onClick={() => handleCardClick(diary)}
+            >
+              <h3 className="text-2xl font-semibold text-blue-600">{diary.title}</h3>
+              <p className="text-gray-500">{diary.date.toDateString()}</p>
+
+              {diary.imageUrl && (
+                <Image
+                  src={diary.imageUrl}
+                  alt={diary.title}
+                  className="object-cover w-full h-40 mt-2 rounded-lg"
+                />
+              )}
+              {diary.audioUrl && (
+                <audio controls className="w-full mt-2">
+                  <source src={diary.audioUrl} type="audio/mpeg" />
+                  Your browser does not support the audio tag.
+                </audio>
+              )}
+              <Text className="mt-4 text-gray-700 truncate">{diary.content}</Text>
+
+              <div className="flex justify-between mt-4">
+                <Button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleEditClick(diary);
+                  }}
+                  colorScheme="blue"
+                  variant="outline"
+                  leftIcon={<FaEdit />}
+                >
+                  Edit
+                </Button>
+                <Button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleLikeClick(diary);
+                  }}
+                  colorScheme={diary.liked ? 'red' : 'gray'}
+                  variant="outline"
+                  leftIcon={diary.liked ? <FaHeart /> : <FaRegHeart />}
+                >
+                  {diary.likes ? `${diary.likes}` : 'Like'}
+                </Button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <Text textAlign="center" color="gray.500">No diaries found for the selected date.</Text>
+        )}
+      </div>
+
+      {selectedDiary && (
+        <Modal isOpen={!!selectedDiary} onClose={closeModal} size="xl">
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>
+              {editMode ? (
+                <Input
+                  value={editDiary.title}
+                  onChange={(e) =>
+                    setEditDiary((prev) => ({ ...prev, title: e.target.value }))
+                  }
+                  variant="flushed"
+                  placeholder="Title"
+                />
+              ) : (
+                selectedDiary.title
+              )}
+            </ModalHeader>
+            <ModalBody>
+              <Text textAlign="center" color="gray.500">{selectedDiary.date.toDateString()}</Text>
+
+              {editMode ? (
+                <FormControl mt={4}>
+                  <FormLabel>Image</FormLabel>
+                  {selectedDiary.imageUrl && !newImage && !editDiary.removeImage && (
+                    <div className="flex items-center mb-2">
+                      <Image
+                        src={selectedDiary.imageUrl}
+                        alt="Current Image"
+                        boxSize="100px"
+                        objectFit="cover"
+                        mr={4}
+                      />
+                      <Button colorScheme="red" onClick={handleRemoveImage}>
+                        Remove Image
+                      </Button>
+                    </div>
+                  )}
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                  />
+                  {newImage && (
+                    <Image
+                      src={URL.createObjectURL(newImage)}
+                      alt="New Image Preview"
+                      boxSize="100px"
+                      objectFit="cover"
+                      mt={2}
+                    />
+                  )}
+                </FormControl>
+              ) : (
+                selectedDiary.imageUrl && (
+                  <Image
+                    src={selectedDiary.imageUrl}
+                    alt={selectedDiary.title}
+                    className="object-cover w-full h-40 mt-2 rounded-lg"
+                  />
+                )
+              )}
+
+              {selectedDiary.audioUrl && (
+                <audio controls className="w-full mt-2">
+                  <source src={selectedDiary.audioUrl} type="audio/mpeg" />
+                  Your browser does not support the audio tag.
+                </audio>
+              )}
+
+              <FormControl mt={4}>
+                <FormLabel>Content</FormLabel>
+                <Textarea
+                  value={editMode ? editDiary.content : selectedDiary.content}
+                  onChange={(e) =>
+                    setEditDiary((prev) => ({ ...prev, content: e.target.value }))
+                  }
+                  placeholder="Content"
+                  size="lg"
+                  isReadOnly={!editMode}
+                />
+              </FormControl>
+            </ModalBody>
+            <ModalFooter>
+              {editMode ? (
+                <>
+                  <Button colorScheme="blue" mr={3} onClick={handleSaveEdit}>
+                    Save
+                  </Button>
+                  <Button variant="ghost" onClick={closeModal}>Cancel</Button>
+                </>
+              ) : (
+                <Button colorScheme="blue" onClick={closeModal}>
+                  Close
+                </Button>
+              )}
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
+    </div>
   );
 };
 
