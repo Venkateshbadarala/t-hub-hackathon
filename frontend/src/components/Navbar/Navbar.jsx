@@ -14,7 +14,7 @@ const Navbar = () => {
   const [allDiaries, setAllDiaries] = useState([]);
   const { colorMode } = useColorMode(); // To determine current theme
   const [postsCount, setPostsCount] = useState(0);
-  const [userEmail, setUserEmail] = useState(null);
+  const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -24,9 +24,9 @@ const Navbar = () => {
   useEffect(() => {
     const unsubscribeAuth = auth.onAuthStateChanged((user) => {
       if (user) {
-        setUserEmail(user.email);
+        setUserId(user.uid);
       } else {
-        setUserEmail(null);
+        setUserId(null);
         setPostsCount(0);
       }
     });
@@ -36,14 +36,14 @@ const Navbar = () => {
 
   // Listen for changes in the user's diaries collection
   useEffect(() => {
-    if (!userEmail) {
+    if (!userId) {
       setAllDiaries([]);
       setPostsCount(0);
       setLoading(false);
       return;
     }
 
-    const diariesRef = collection(db, 'users', userEmail, 'diaries');
+    const diariesRef = collection(db, 'users', userId, 'diaries');
     const q = query(diariesRef);
 
     const unsubscribe = onSnapshot(
@@ -67,7 +67,7 @@ const Navbar = () => {
     );
 
     return () => unsubscribe();
-  }, [userEmail]);
+  }, [userId]);
 
   useMotionValueEvent(scrollY, 'change', (latest) => {
     const previous = scrollY.getPrevious();
@@ -96,7 +96,7 @@ const Navbar = () => {
           shadow-md transition-colors duration-300 rounded-b-lg`}
       >
         <div className="flex-shrink-0">
-          <h1 className="text-2xl font-serif text-black dark:text-white">Emo-Diary</h1>
+          <h1 className="font-serif text-2xl text-black dark:text-white">Emo-Diary</h1>
         </div>
 
         <div className="flex items-center space-x-6">
@@ -110,8 +110,8 @@ const Navbar = () => {
             }
             aria-label="Posts Count Tooltip"
           >
-            <div className="flex items-center text-gray-700 dark:text-gray-200 cursor-pointer">
-              <FaFire className="text-yellow-500 mr-1" size={20} />
+            <div className="flex items-center text-gray-700 cursor-pointer dark:text-gray-200">
+              <FaFire className="mr-1 text-yellow-500" size={20} />
               <span className="text-lg">
                 {loading ? '...' : error ? '!' : postsCount}
               </span>

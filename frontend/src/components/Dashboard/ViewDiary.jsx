@@ -163,7 +163,7 @@ const ViewDiaries = ({ selectedDate }) => {
   // };
 
   const handleLikeClick = async (diary) => {
-    const userDocRef = doc(db, 'users', user.email);
+    const userDocRef = doc(db, 'users', user.uid);
     const diaryDocRef = doc(userDocRef, 'diaries', diary.id);
 
     const updatedLike = diary.liked ? false : true;
@@ -212,7 +212,7 @@ const ViewDiaries = ({ selectedDate }) => {
       </div>
 
       {loading && (
-        <div className="flex justify-center items-center my-4">
+        <div className="flex items-center justify-center my-4">
           <Spinner size="xl" />
         </div>
       )}

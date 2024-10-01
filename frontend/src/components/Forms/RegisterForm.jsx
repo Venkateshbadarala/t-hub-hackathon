@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate,Link as RouterLink } from 'react-router-dom'; // Import useNavigate
+import { useNavigate,Link as RouterLink } from 'react-router-dom'; 
 import { auth } from '../../firebase-config';
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
@@ -44,7 +44,7 @@ const RegisterForm = () => {
 
       toast.success('User registered successfully!');
       toast.success('A verification link has been sent to your email.');
-      navigate('/login');
+      navigate('/dashboard');
     } catch (error) {
       if (error.code === "auth/email-already-in-use") {
         toast.error('Email already exists');
