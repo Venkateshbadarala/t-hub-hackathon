@@ -9,7 +9,7 @@
 
 /__pycache__
 
-key.json
+.key.json
 
 # testing
 /coverage
