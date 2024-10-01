@@ -41,8 +41,7 @@ const ProfileForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!user) return; // Ensure user is authenticated
-
+        if (!user) return; 
         let imageUrl = '';
         if (selectedImage) {
             const storageRef = ref(storage, `profile_images/${user.uid}`);
@@ -67,7 +66,7 @@ const ProfileForm = () => {
 
     const uploadImage = async (storageRef, file) => {
         const imageData = await uploadString(storageRef, await convertToBase64(file), 'data_url');
-        return imageData.ref.toString(); // Get the URL after uploading
+        return imageData.ref.toString();
     };
 
     const convertToBase64 = (file) => {
