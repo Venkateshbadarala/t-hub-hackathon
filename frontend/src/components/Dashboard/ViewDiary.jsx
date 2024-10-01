@@ -5,7 +5,7 @@ import Modal from 'react-modal';
 import { FaEdit, FaHeart, FaRegHeart, FaTrash } from 'react-icons/fa';
 
 const ViewDiaries = ({ selectedDate }) => {
-  const [diaries, setDiaries] = useState([]);
+  const [ setDiaries] = useState([]);
   const [allDiaries, setAllDiaries] = useState([]);
   const [selectedDiary, setSelectedDiary] = useState(null); 
   const [editMode, setEditMode] = useState(false); 

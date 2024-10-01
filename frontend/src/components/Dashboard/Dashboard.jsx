@@ -4,6 +4,7 @@ import ViewDiaries from './ViewDiary';
 import { useNavigate } from 'react-router-dom';
 import DiaryCalendar from './Calender';
 import AddDiary from './AddDiary';
+import Navbar from '../Navbar/Navbar';
 
 const Dashboard = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -41,7 +42,7 @@ const Dashboard = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Welcome to your Dashboard</h1>
+      
       <DiaryCalendar onDateChange={setSelectedDate} />
       <ViewDiaries selectedDate={selectedDate} />
       <AddDiary />

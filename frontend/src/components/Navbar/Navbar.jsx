@@ -32,11 +32,11 @@ const Navbar = () => {
       transition={{ duration: 0.4, ease: 'easeInOut' }}
       className="fixed z-50 flex flex-col"
     >
-      <div className="flex flex-row items-center justify-around font-bold text-white bg-black sm:p-4 rounded-[10px] w-[100vw]  ">
+      <div className="flex flex-row items-center justify-around font-bold text-white bg-black sm:p-4 rounded-[2px] w-[100vw]  ">
         <div className="x-sm:w-[14rem] sm:w-[20rem] ">
-          <h1 className='text-xl dark:text-red-600' >Diary</h1>
+          <h1 className='text-[1.6rem] font-serif ' >Emo-Diary</h1>
         </div>
-       <div className='flex  justify-between gap-10 items-center  '>
+       <div className='flex items-center justify-between gap-10 '>
        <div>
        <DarkModeToggle/>
        </div>
