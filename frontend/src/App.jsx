@@ -6,6 +6,7 @@ import Login from './components/Forms/LoginForm';
 import ForgotPassword from './components/Forms/ForgotForm';
 import Dashboard from './components/Dashboard/Dashboard';
 import Navbar from './components/Navbar/Navbar';
+import { HistoryProvider } from './context/useHistory';
 
 
 
@@ -13,7 +14,9 @@ import Navbar from './components/Navbar/Navbar';
 const App = () => {
   return (
     <Router>
+      <HistoryProvider>
       <Navbar/>
+     
       <Routes>
       
         <Route path="/signup" element={<Register />} />
@@ -22,6 +25,7 @@ const App = () => {
         <Route path="/dashboard" element={<Dashboard/>} />
       
       </Routes>
+      </HistoryProvider>
     </Router>
   );
 };

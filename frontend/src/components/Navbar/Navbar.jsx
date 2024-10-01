@@ -1,12 +1,12 @@
-// Navbar.js
 import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
-import DarkModeToggle from './ThemeSwitch';
 import AccountImage from './AccountImage';
-import { FaFire } from 'react-icons/fa';
+import { FaFire, FaHistory } from 'react-icons/fa';
 import { auth, db } from '../../firebase-config';
 import { collection, query, onSnapshot } from 'firebase/firestore';
 import { Tooltip, useColorMode } from '@chakra-ui/react';
+import { Link } from 'react-router-dom';
+import { useHistoryContext } from '../../context/useHistory'; // Import the correct hook
 
 const Navbar = () => {
   const { scrollY } = useScroll();
@@ -18,7 +18,9 @@ const Navbar = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Listen for authentication state changes
+  // Access toggleHistory from the History context
+  const { toggleHistory } = useHistoryContext(); 
+
   useEffect(() => {
     const unsubscribeAuth = auth.onAuthStateChanged((user) => {
       if (user) {
@@ -67,10 +69,9 @@ const Navbar = () => {
     return () => unsubscribe();
   }, [userEmail]);
 
-  // Handle scroll to hide/show Navbar
   useMotionValueEvent(scrollY, 'change', (latest) => {
     const previous = scrollY.getPrevious();
-    if (previous !== undefined) { // Ensure previous is defined
+    if (previous !== undefined) {
       if (latest > previous && latest > 20) {
         setHidden(true);
       } else {
@@ -94,14 +95,11 @@ const Navbar = () => {
           ${colorMode === 'dark' ? 'bg-gray-800' : 'bg-slate-200'} 
           shadow-md transition-colors duration-300 rounded-b-lg`}
       >
-        {/* Logo / Title */}
         <div className="flex-shrink-0">
           <h1 className="text-2xl font-serif text-black dark:text-white">Emo-Diary</h1>
         </div>
 
-        {/* Navigation Items */}
         <div className="flex items-center space-x-6">
-          {/* Fire Icon with Posts Count */}
           <Tooltip
             label={
               loading
@@ -119,11 +117,11 @@ const Navbar = () => {
               </span>
             </div>
           </Tooltip>
+          
+          <div onClick={toggleHistory} className="cursor-pointer"> 
+            <FaHistory size={20} />
+          </div>
 
-          {/* Dark Mode Toggle */}
-          <DarkModeToggle />
-
-          {/* Account Image */}
           <AccountImage />
         </div>
       </div>
