@@ -62,7 +62,7 @@ const DoctorDashboard = ({ doctorId }) => {
                     transition={{ duration: 0.3 }}
                     className="flex items-center justify-between bg-gray-700 p-4 rounded-lg"
                   >
-                    {/* Appointment Details */}
+                    
                     <div>
                       <p className="font-semibold text-lg">{appointment.patientName}</p>
                       <div className="flex items-center text-sm text-gray-400">
@@ -72,7 +72,6 @@ const DoctorDashboard = ({ doctorId }) => {
                         {appointment.time}
                       </div>
                     </div>
-                    {/* Action Buttons */}
                     <div className="flex items-center space-x-2">
                       {appointment.status === 'pending' ? (
                         <>
