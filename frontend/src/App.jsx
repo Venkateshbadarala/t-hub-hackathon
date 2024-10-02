@@ -11,6 +11,7 @@ import { HistoryProvider } from './context/useHistory';
 import PregisterForm from './components/Forms/PRegister';
 import PloginForm from './components/Forms/Plogin';
 import DoctorDashboard from './components/Dashboard/PdashBoard';
+import DoctorBooking from './components/DoctorAppointment';
 
 
 const App = () => {
@@ -24,8 +25,8 @@ const App = () => {
           <Route path="/plogin" element={<PloginForm />} />
 
           <Route path='/pdashboard' element={<DoctorDashboard/>}/>
-           
-            <Route path="/signup" element={<Register />} />
+          <Route path="/doctor-booking" element={<DoctorBooking />} />
+          <Route path="/signup" element={<Register />} />
             <Route path="/" element={<Login />} />
             <Route path="/forgot" element={<ForgotPassword />} />
             <Route path="/dashboard" element={<Dashboard />} />

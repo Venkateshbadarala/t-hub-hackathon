@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Use `useNavigate` for navigation
 import AccountImage from './AccountImage';
-import { FaFire, FaHeart } from 'react-icons/fa';
+import { FaFire, FaHeart, FaStar } from 'react-icons/fa';
 import { auth, db } from '../../firebase-config';
 import { collection, query, onSnapshot } from 'firebase/firestore';
 import { Tooltip } from '@chakra-ui/react';
 import { RiTeamFill } from 'react-icons/ri';
 import { IoHomeSharp } from 'react-icons/io5';
 import AddDiary from '../Dashboard/AddDiary';
-import logo from './e-diarylogo.png'
+import logo from './e-diarylogo.png';
+import { FaUserDoctor } from 'react-icons/fa6';
+
 const NavbarRoutes = [
   {
     id: 1,
@@ -25,13 +27,14 @@ const NavbarRoutes = [
   },
   {
     id: 3,
-    name: 'Likes',
-    icon: <FaHeart />,
+    name: 'Starred',
+    icon: <FaStar />,
     route: '/likes',
   },
 ];
 
 const Navbar = () => {
+  const navigate = useNavigate(); // Initialize navigation
   const { scrollY } = useScroll();
   const [hidden, setHidden] = useState(false);
   const [allDiaries, setAllDiaries] = useState([]);
@@ -111,17 +114,15 @@ const Navbar = () => {
       className="fixed top-0 left-0 right-0 z-50 text-white bg-black shadow-lg"
     >
       <div className="flex items-center justify-between px-8 py-3">
-     
-          <img src={logo} alt="logo" className='w-[10rem]' />
-       
+        <img src={logo} alt="logo" className='w-[10rem]' />
 
         {/* Navigation Links */}
-        <nav className="flex space-x-8 ">
+        <nav className="flex space-x-8">
           {NavbarRoutes.map((route) => (
             <Link
               key={route.id}
               to={route.route}
-              className="flex items-center font-bold  transition duration-300 hover:text-indigo-300 text-[18px]"
+              className="flex items-center font-bold transition duration-300 hover:text-indigo-300 text-[18px]"
             >
               <span className="mr-2">{route.icon}</span>
               <span>{route.name}</span>
@@ -131,17 +132,21 @@ const Navbar = () => {
 
         {/* Right Section: AddDiary, Posts Count, and Account */}
         <div className="flex items-center space-x-6">
-          {/* Add Diary Button */}
           <AddDiary />
+          
+          {/* Doctor Appointment Button */}
+          <button onClick={() => navigate('/doctor-booking')} className="flex items-center space-x-2 bg-indigo-600 text-white px-4 py-2 rounded-md transition duration-300 hover:bg-indigo-800">
+            <FaUserDoctor size={20} />
+            <span>Book Appointment</span>
+          </button>
 
-          {/* Tooltip for Posts Count */}
           <Tooltip
             label={
               loading
                 ? 'Loading posts...'
                 : error
                 ? error
-                : `${postsCount} ${postsCount === 1 ? 'Post' : 'Posts'}`
+                : `${postsCount} ${postsCount === 1 ? 'Point' : 'Points'}`
             }
             aria-label="Posts Count Tooltip"
           >

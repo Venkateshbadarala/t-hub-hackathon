@@ -1,6 +1,7 @@
 import React from 'react';
 import { Image, Button, Text, Box, useBreakpointValue } from '@chakra-ui/react';
-import { FaHeart, FaRegHeart } from 'react-icons/fa';
+import { FaHeart, FaRegHeart, FaStar } from 'react-icons/fa';
+import { FaStarHalfStroke } from 'react-icons/fa6';
 
 const DiaryCard = ({ diary, onCardClick, onLikeClick }) => {
   return (
@@ -60,13 +61,13 @@ const DiaryCard = ({ diary, onCardClick, onLikeClick }) => {
             onLikeClick(diary);
           }}
           colorScheme={diary.liked ? 'red' : 'gray'}
-          leftIcon={diary.liked ? <FaHeart /> : <FaRegHeart />}
+          leftIcon={diary.liked ? <FaStar/> : <FaStarHalfStroke />}
           borderRadius="full"
           variant="outline"
           _hover={{ bg: diary.liked ? 'red.100' : 'gray.100' }}
           className="flex items-center justify-center text-center"
         >
-          {diary.liked ? 'Liked' : 'Like'}
+       
         </Button>
       </Box>
     </Box>
