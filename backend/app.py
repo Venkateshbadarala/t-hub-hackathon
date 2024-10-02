@@ -63,13 +63,20 @@ def check_consecutive_negative_emotions(user_id, latest_emotion):
     # Fetch the diary entries for the last 7 days
     now = datetime.now()
     last_7_days = now - timedelta(days=7)
-    docs = db.collection("diary").where("userId", "==", user_id).where("timestamp", ">=", last_7_days).get()
+
+    # Reference to the user's diary collection
+    user_doc_ref = db.collection("users").document(user_id)  # Get user document reference
+    diary_collection_ref = user_doc_ref.collection("diaries")  # Get the diaries subcollection reference
+
+    # Fetch diary entries from the last 7 days
+    docs = diary_collection_ref.where("date", ">=", last_7_days.isoformat()).get()  # Assuming 'date' is stored in ISO format
 
     # Count negative emotion entries
     negative_days = 0
     for doc in docs:
         emotion = doc.to_dict().get("emotion")
         if emotion in NEGATIVE_EMOTIONS:
+            logging.debug(doc.to_dict())  # Use logging for debugging
             negative_days += 1
 
     # If more than 3 days of negative emotions, recommend activities and music
