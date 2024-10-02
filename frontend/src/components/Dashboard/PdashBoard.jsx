@@ -1,31 +1,84 @@
 // src/components/DoctorDashboard.jsx
-import React, { useState } from 'react';
-import { FaCalendarAlt, FaClock, FaCheck, FaTimes, FaUserCircle } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { FaCheck, FaTimes } from 'react-icons/fa';
 import { motion } from 'framer-motion';
+import { 
+  collection, 
+  onSnapshot, 
+  updateDoc, 
+  doc, 
+  query, 
+  orderBy 
+} from 'firebase/firestore';
 import { db } from '../../firebase-config';
-const DoctorDashboard = () => {
-  const [appointments, setAppointments] = useState([
-    { id: 1, patient: "Alice Johnson", date: "2024-10-05", time: "10:00 AM", status: "pending" },
-    { id: 2, patient: "Bob Smith", date: "2024-10-06", time: "2:00 PM", status: "pending" },
-    { id: 3, patient: "Carol Williams", date: "2024-10-07", time: "11:30 AM", status: "pending" },
-  ]);
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-  // Sample data for patients
-  const [patients] = useState([
-    { id: 1, name: "Alice Johnson", age: 32, lastVisit: "2024-09-20" },
-    { id: 2, name: "Bob Smith", age: 45, lastVisit: "2024-09-25" },
-    { id: 3, name: "Carol Williams", age: 28, lastVisit: "2024-09-30" },
-  ]);
+const DoctorDashboard = () => {
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true); // Loading state
+  const [error, setError] = useState(null); // Error state
+
+  // Fetch appointments from Firestore with real-time updates
+  useEffect(() => {
+    const appointmentsRef = collection(db, 'appointments');
+    const q = query(appointmentsRef, orderBy('appointmentDate', 'asc'));
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const appointmentsData = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setAppointments(appointmentsData);
+        setLoading(false);
+      },
+      (err) => {
+        console.error('Error fetching appointments:', err);
+        setError('Failed to fetch appointments.');
+        setLoading(false);
+      }
+    );
+
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
+  }, []);
 
   // Handle approving or denying appointments
-  const handleAppointment = (id, action) => {
-    setAppointments(appointments.map(app =>
-      app.id === id ? { ...app, status: action === 'approve' ? 'approved' : 'denied' } : app
-    ));
+  const handleAppointment = async (id, action) => {
+    try {
+      const appointmentDoc = doc(db, 'appointments', id);
+      await updateDoc(appointmentDoc, {
+        status: action === 'approve' ? 'approved' : 'denied'
+      });
+
+      // Optionally, display a success notification
+      toast.success(`Appointment ${action}d successfully.`);
+    } catch (error) {
+      console.error('Error updating appointment:', error);
+      toast.error('Failed to update appointment. Please try again.');
+    }
   };
 
   // Count of pending appointments
   const pendingCount = appointments.filter(app => app.status === 'pending').length;
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen text-gray-100">
+        Loading...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-screen text-red-500">
+        {error}
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-900 min-h-screen text-gray-100">
@@ -35,7 +88,7 @@ const DoctorDashboard = () => {
       </header>
 
       <main className="p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
           {/* Appointment Requests */}
           <section>
             <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
@@ -54,19 +107,11 @@ const DoctorDashboard = () => {
                     transition={{ duration: 0.3 }}
                     className="flex items-center justify-between bg-gray-700 p-4 rounded-lg"
                   >
-                    {/* Appointment Details */}
                     <div>
-                      <p className="font-semibold text-lg">{appointment.patient}</p>
-                      <div className="flex items-center text-sm text-gray-400">
-                        <FaCalendarAlt className="mr-2 h-4 w-4" />
-                        {appointment.date}
-                        <FaClock className="ml-4 mr-2 h-4 w-4" />
-                        {appointment.time}
-                      </div>
+                      <p className="font-semibold text-lg">{appointment.patientName || 'Unknown Patient'}</p>
                     </div>
-                    {/* Action Buttons */}
                     <div className="flex items-center space-x-2">
-                      {appointment.status === 'pending' ? (
+                      {(appointment.status === 'pending' || !appointment.status) ? (
                         <>
                           <button
                             onClick={() => handleAppointment(appointment.id, 'approve')}
@@ -87,7 +132,9 @@ const DoctorDashboard = () => {
                             appointment.status === 'approved' ? 'bg-green-600' : 'bg-red-600'
                           }`}
                         >
-                          {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
+                          {appointment.status
+                            ? appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)
+                            : 'Pending'}
                         </span>
                       )}
                     </div>
@@ -96,41 +143,10 @@ const DoctorDashboard = () => {
               </ul>
             </div>
           </section>
-
-          {/* Patient Details */}
-          <section>
-            <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-              <h2 className="text-xl font-semibold mb-4">Patient Details</h2>
-              <div className="space-y-4">
-                {patients.map(patient => (
-                  <div key={patient.id} className="flex items-center justify-between bg-gray-700 p-4 rounded-lg">
-                    {/* Patient Info */}
-                    <div className="flex items-center space-x-4">
-                      {/* User Avatar */}
-                      <div className="relative">
-                        <img
-                          src={`https://i.pravatar.cc/100?u=${patient.name}`}
-                          alt={patient.name}
-                          className="h-12 w-12 rounded-full object-cover"
-                        />
-                        <FaUserCircle className="absolute -bottom-1 -right-1 text-blue-500 h-4 w-4" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-lg">{patient.name}</p>
-                        <p className="text-sm text-gray-400">Age: {patient.age}</p>
-                      </div>
-                    </div>
-                    {/* Last Visit */}
-                    <div className="text-sm text-gray-400">
-                      Last Visit: {patient.lastVisit}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
         </div>
       </main>
+
+      <ToastContainer />
     </div>
   );
 };

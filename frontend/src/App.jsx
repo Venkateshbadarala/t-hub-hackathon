@@ -12,6 +12,7 @@ import PregisterForm from './components/Forms/PRegister';
 import PloginForm from './components/Forms/Plogin';
 import DoctorDashboard from './components/Dashboard/PDashBoard';
 import DoctorBooking from './components/DoctorAppointment';
+import Community from './components/community';
 
 
 const App = () => {
@@ -31,7 +32,7 @@ const App = () => {
             <Route path="/forgot" element={<ForgotPassword />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/likes" element={<Likes />} />
-          
+          <Route  path="/community" element={<Community/>}/>
           </Routes>
         </div>
       </HistoryProvider>

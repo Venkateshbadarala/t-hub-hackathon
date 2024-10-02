@@ -115,7 +115,7 @@ const Navbar = () => {
     >
       <div className="flex items-center justify-between px-8 py-3">
         {/* <img src={logo} alt="logo" className='w-[10rem]' /> */}
-        <h1 className='text-4xl libre-baskerville-regular-italic'> Emo-diary</h1>
+        <h1 className='text-2xl   '> Emo-Diary</h1>
 
         {/* Navigation Links */}
         <nav className="flex space-x-8">

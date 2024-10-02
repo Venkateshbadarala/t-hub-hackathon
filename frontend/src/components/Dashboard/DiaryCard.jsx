@@ -6,7 +6,7 @@ import { FaStarHalfStroke } from 'react-icons/fa6';
 const DiaryCard = ({ diary, onCardClick, onLikeClick }) => {
   return (
     <Box
-      className="transition-transform transform bg-white rounded-lg shadow-lg cursor-pointer hover:shadow-xl hover:scale-105 w-[20rem]  mx-auto"
+      className="transition-transform transform bg-white rounded-lg shadow-lg cursor-pointer hover:shadow-xl hover:scale-105 w-[22rem]  mx-auto"
       p={4}
       onClick={() => onCardClick(diary)}
       borderWidth="1px"
