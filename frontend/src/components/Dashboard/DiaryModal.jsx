@@ -1,129 +1,70 @@
+// DiaryModal.js
 import React from 'react';
 import {
   Modal,
   ModalOverlay,
   ModalContent,
   ModalHeader,
+  ModalCloseButton,
   ModalBody,
   ModalFooter,
   Button,
   Text,
-  Input,
-  Textarea,
-  Image,
-  FormControl,
-  FormLabel,
+  Box,
 } from '@chakra-ui/react';
 
-const DiaryModal = ({
-  isOpen,
-  onClose,
-  selectedDiary,
-  editMode,
-  editDiary,
-  setEditDiary,
-  handleSaveEdit,
-  handleRemoveImage,
-  newImage,
-  handleImageChange,
-  handleLikeClick, // Include handleLikeClick in props
-}) => {
+const DiaryModal = ({ diary, isOpen, onClose }) => {
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} size="lg">
       <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>{editMode ? 'Edit Diary' : selectedDiary.title}</ModalHeader>
-        <ModalBody>
-          {editMode ? (
-            <FormControl>
-              <FormLabel>Title</FormLabel>
-              <Input
-                value={editDiary.title}
-                onChange={(e) =>
-                  setEditDiary((prev) => ({ ...prev, title: e.target.value }))
-                }
-                mb={4}
-              />
-              <FormLabel>Content</FormLabel>
-              <Textarea
-                value={editDiary.content}
-                onChange={(e) =>
-                  setEditDiary((prev) => ({ ...prev, content: e.target.value }))
-                }
-                mb={4}
-              />
-              <FormLabel>Image</FormLabel>
-              {selectedDiary.imageUrl && !editDiary.removeImage && (
-                <Image
-                  src={selectedDiary.imageUrl}
-                  alt="Current Image"
-                  className="object-cover w-full h-40 mt-2 rounded-lg"
-                  mb={4}
-                />
-              )}
-              {newImage ? (
-                <p>{newImage.name}</p>
-              ) : (
-                <>
-                  <Input type="file" accept="image/*" onChange={handleImageChange} />
-                  {selectedDiary.imageUrl && !editDiary.removeImage && (
-                    <Button
-                      colorScheme="red"
-                      variant="outline"
-                      mt={2}
-                      onClick={handleRemoveImage}
-                    >
-                      Remove Image
-                    </Button>
-                  )}
-                </>
-              )}
-            </FormControl>
-          ) : (
-            <>
-              <Text>{selectedDiary.content}</Text>
-              {selectedDiary.imageUrl && (
-                <Image
-                  src={selectedDiary.imageUrl}
-                  alt={selectedDiary.title}
-                  className="object-cover w-full h-40 mt-2 rounded-lg"
-                />
-              )}
-              {selectedDiary.audioUrl && (
-                <audio controls className="w-full mt-2">
-                  <source src={selectedDiary.audioUrl} type="audio/mpeg" />
-                  Your browser does not support the audio tag.
-                </audio>
-              )}
-            </>
-          )}
+      <ModalContent
+        borderRadius="md"   // Rounded corners
+        boxShadow="xl"      // Shadow effect
+      >
+        <ModalHeader textAlign="center" fontWeight="bold" fontSize="2xl" borderBottomWidth={1}>
+          {diary.title}
+        </ModalHeader>
+        <ModalCloseButton color="red.500" />
+        <ModalBody padding={6}>
+          <Box 
+            borderRadius="md"
+            padding={4}
+            boxShadow="base" // Subtle shadow for the content box
+          >
+            {/* Title Section */}
+            <Text fontSize="lg" fontWeight="bold" color="gray.800" mb={2}>
+              Title:
+            </Text>
+            <Text fontSize="lg" lineHeight="tall" color="gray.700" mb={4}>
+              {diary.title}
+            </Text>
+            
+            {/* Content Section */}
+            <Text fontSize="lg" fontWeight="bold" color="gray.800" mb={2}>
+              Content:
+            </Text>
+            <Text fontSize="lg" lineHeight="tall" color="gray.700" mb={4}>
+              {diary.content}
+            </Text>
+            
+            {/* Date Section */}
+            <Text fontSize="lg" fontWeight="bold" color="gray.800" mb={2}>
+              Date:
+            </Text>
+            <Text fontSize="sm" color="gray.500">
+              {diary.date.toLocaleDateString()}
+            </Text>
+          </Box>
         </ModalBody>
-        <ModalFooter>
-          {editMode ? (
-            <>
-              <Button colorScheme="blue" mr={3} onClick={handleSaveEdit}>
-                Save
-              </Button>
-              <Button variant="ghost" onClick={onClose}>
-                Cancel
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button
-                colorScheme={selectedDiary.liked ? 'red' : 'gray'}
-                variant="outline"
-                onClick={() => handleLikeClick(selectedDiary)} 
-                mr={3}
-              >
-                {selectedDiary.liked ? 'Unlike' : 'Like'}
-              </Button>
-              <Button colorScheme="blue" mr={3} onClick={onClose}>
-                Edit
-              </Button>
-            </>
-          )}
-          <Button variant="ghost" onClick={onClose}>
+        <ModalFooter justifyContent="center">
+          <Button 
+            colorScheme="blue" 
+            onClick={onClose} 
+            variant="solid" 
+            size="lg" 
+            borderRadius="md" 
+            paddingX={8}
+          >
             Close
           </Button>
         </ModalFooter>

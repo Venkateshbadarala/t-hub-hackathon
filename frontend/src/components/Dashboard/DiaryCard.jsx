@@ -1,48 +1,59 @@
-// DiaryCard.js
 import React from 'react';
-import {
-  Button,
-  Text,
-  Image,
-} from '@chakra-ui/react';
-import { FaEdit, FaHeart, FaRegHeart } from 'react-icons/fa';
+import { Image, Button, Text, Box, useBreakpointValue } from '@chakra-ui/react';
+import { FaHeart, FaRegHeart } from 'react-icons/fa';
 
-const DiaryCard = ({ diary, onClick, onEditClick, onLikeClick }) => {
+const DiaryCard = ({ diary, onCardClick, onLikeClick }) => {
   return (
-    <div
-      className="p-4 transition-transform transform bg-white rounded-lg shadow-md cursor-pointer hover:shadow-xl hover:scale-105"
-      onClick={onClick}
+    <Box
+      className="transition-transform transform bg-white rounded-lg shadow-lg cursor-pointer hover:shadow-xl hover:scale-105 w-[20rem]  mx-auto"
+      p={4}
+      onClick={() => onCardClick(diary)}
+      borderWidth="1px"
+      borderColor="gray.200"
+      borderRadius="md"
     >
-      <h3 className="text-2xl font-semibold text-blue-600">{diary.title}</h3>
-      <p className="text-gray-500">{diary.date.toDateString()}</p>
+      <Text
+        fontFamily="serif"
+        fontSize={useBreakpointValue({ base: 'xl', md: '2xl' })}
+        fontWeight="bold"
+        color="blue.600"
+        mb={2}
+      >
+        {diary.title}
+      </Text>
 
       {diary.imageUrl && (
         <Image
           src={diary.imageUrl}
           alt={diary.title}
-          className="object-cover w-full h-40 mt-2 rounded-lg"
+          className="object-cover w-full h-40 mb-2 rounded-lg"
+          borderRadius="md"
         />
       )}
+
       {diary.audioUrl && (
-        <audio controls className="w-full mt-2">
+        <audio controls className="w-full mb-2 rounded-md">
           <source src={diary.audioUrl} type="audio/mpeg" />
           Your browser does not support the audio tag.
         </audio>
       )}
-      <Text className="mt-4 text-gray-700 truncate">{diary.content}</Text>
 
-      <div className="flex justify-between mt-4">
-        <Button
-          onClick={(e) => {
-            e.stopPropagation();
-            onEditClick(diary);
-          }}
-          colorScheme="blue"
-          variant="outline"
-          leftIcon={<FaEdit />}
-        >
-          Edit
-        </Button>
+      {/* Truncate content to show only two lines */}
+      <Text
+        className="mt-4 overflow-hidden text-gray-700"
+        style={{
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+        }}
+      >
+        {diary.content}
+      </Text>
+
+      <Box className="flex items-center justify-between mt-4">
+        <Text className="font-semibold text-gray-500">{diary.date.toDateString()}</Text>
         <Button
           onClick={(e) => {
             e.stopPropagation();
@@ -50,11 +61,15 @@ const DiaryCard = ({ diary, onClick, onEditClick, onLikeClick }) => {
           }}
           colorScheme={diary.liked ? 'red' : 'gray'}
           leftIcon={diary.liked ? <FaHeart /> : <FaRegHeart />}
+          borderRadius="full"
+          variant="outline"
+          _hover={{ bg: diary.liked ? 'red.100' : 'gray.100' }}
+          className="flex items-center justify-center text-center"
         >
-          {diary.likes || 0}
+          {diary.liked ? 'Liked' : 'Like'}
         </Button>
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 

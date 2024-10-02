@@ -4,6 +4,8 @@ import ViewDiaries from './ViewDiary';
 import { useNavigate } from 'react-router-dom';
 import DiaryCalendar from './Calender';
 import AddDiary from './AddDiary';
+import EmotionalGraph from './EmotionGraph';
+import Navbar from '../Navbar/Navbar';
 
 const Dashboard = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -11,14 +13,14 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
+    const storedUser = sessionStorage.getItem('user');
     if (storedUser) {
       setUser(storedUser);
     } else {
       const unsubscribe = auth.onAuthStateChanged((currentUser) => {
         if (currentUser) {
           setUser(currentUser.email);
-          localStorage.setItem('user', currentUser.email); 
+          sessionStorage.setItem('user', currentUser.email); 
         } else {
           navigate('/login');
         }
@@ -36,16 +38,21 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="flex p-6">
-      <div className="flex-1">
-        <h1 className="text-2xl font-bold mb-4">Welcome to your Dashboard</h1>
+    <div>
+      
+   <Navbar/>
+    <div className="flex pt-[6%] justify-around  ">
+      <div className="fixed left-0">
+       
         <ViewDiaries selectedDate={selectedDate} />
-        <div className=''>
-        <AddDiary /> </div>
+        
       </div>
-      <div className="flex-none ml-4"> 
+      <div className="fixed right-10"> 
         <DiaryCalendar onDateChange={setSelectedDate} />
+        <EmotionalGraph/>
+       
       </div>
+    </div>
     </div>
   );
 };

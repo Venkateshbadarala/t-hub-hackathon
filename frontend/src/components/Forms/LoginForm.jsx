@@ -6,6 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate, Link as RouterLink } from 'react-router-dom'; 
 import 'react-toastify/dist/ReactToastify.css';
 import LoginProvider from './LoginProvider';
+import pic1 from './pic1.png'
 import {
   Box,
   Button,
@@ -66,10 +67,13 @@ const LoginForm = () => {
         bg="transparent"
         color="white"
       >
-        <Heading size="lg" mb={4}>
+       <div>
+        <img src={pic1} alt="pic1" />
+       </div>
+        <Heading size="lg" mb={4} className='libre-baskerville-regular-italic'>
           Emo-Diary 
         </Heading>
-        <Text fontSize="lg" mb={6}>
+        <Text fontSize="lg" mb={6} className='libre-baskerville-regular-italic'>
           Welcome to your personal mental wellness
         </Text>
       </Flex>
@@ -84,11 +88,11 @@ const LoginForm = () => {
         shadow="lg"
       >
         <Box width="100%" maxW="md">
-          <Heading as="h2" size="xl" textAlign="center" mb={6}>
+          <Heading as="h2" size="xl" textAlign="center" mb={6}  className='text-black'>
             Welcome Back...
           </Heading>
 
-          <form onSubmit={handleSubmit(handleLogin)}>
+          <form onSubmit={handleSubmit(handleLogin)} className='text-black'>
             <VStack spacing={4} align="stretch" width="100%">
               {/* Email Field */}
               <FormControl isInvalid={errors.email}>

@@ -1,26 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import AccountImage from './AccountImage';
-import { FaFire, FaHistory } from 'react-icons/fa';
+import { FaFire, FaHeart } from 'react-icons/fa';
 import { auth, db } from '../../firebase-config';
 import { collection, query, onSnapshot } from 'firebase/firestore';
-import { Tooltip, useColorMode } from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
-import { useHistoryContext } from '../../context/useHistory'; // Import the correct hook
+import { Tooltip } from '@chakra-ui/react';
+import { RiTeamFill } from 'react-icons/ri';
+import { IoHomeSharp } from 'react-icons/io5';
+import AddDiary from '../Dashboard/AddDiary';
+import logo from './e-diarylogo.png'
+const NavbarRoutes = [
+  {
+    id: 1,
+    name: 'Home',
+    icon: <IoHomeSharp />,
+    route: '/dashboard',
+  },
+  {
+    id: 2,
+    name: 'Community',
+    icon: <RiTeamFill />,
+    route: '/community',
+  },
+  {
+    id: 3,
+    name: 'Likes',
+    icon: <FaHeart />,
+    route: '/likes',
+  },
+];
 
 const Navbar = () => {
   const { scrollY } = useScroll();
   const [hidden, setHidden] = useState(false);
   const [allDiaries, setAllDiaries] = useState([]);
-  const { colorMode } = useColorMode(); // To determine current theme
   const [postsCount, setPostsCount] = useState(0);
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Access toggleHistory from the History context
-  const { toggleHistory } = useHistoryContext(); 
-
+  // Track user authentication status
   useEffect(() => {
     const unsubscribeAuth = auth.onAuthStateChanged((user) => {
       if (user) {
@@ -30,11 +50,10 @@ const Navbar = () => {
         setPostsCount(0);
       }
     });
-
     return () => unsubscribeAuth();
   }, []);
 
-  // Listen for changes in the user's diaries collection
+  // Fetch user's diaries from Firebase Firestore
   useEffect(() => {
     if (!userId) {
       setAllDiaries([]);
@@ -69,6 +88,7 @@ const Navbar = () => {
     return () => unsubscribe();
   }, [userId]);
 
+  // Detect scroll and show/hide the navbar based on scroll direction
   useMotionValueEvent(scrollY, 'change', (latest) => {
     const previous = scrollY.getPrevious();
     if (previous !== undefined) {
@@ -84,22 +104,37 @@ const Navbar = () => {
     <motion.div
       variants={{
         visible: { y: 0 },
-        hidden: { y: '-100%' }, // Adjust to '-100%' to hide completely
+        hidden: { y: '-100%' },
       }}
       animate={hidden ? 'hidden' : 'visible'}
       transition={{ duration: 0.3, ease: 'easeInOut' }}
-      className="fixed top-0 left-0 right-0 z-50"
+      className="fixed top-0 left-0 right-0 z-50 text-white bg-black shadow-lg"
     >
-      <div
-        className={`flex flex-row items-center justify-between px-6 py-4 
-          ${colorMode === 'dark' ? 'bg-gray-800' : 'bg-slate-200'} 
-          shadow-md transition-colors duration-300 rounded-b-lg`}
-      >
-        <div className="flex-shrink-0">
-          <h1 className="font-serif text-2xl text-black dark:text-white">Emo-Diary</h1>
-        </div>
+      <div className="flex items-center justify-between px-8 py-3">
+     
+          <img src={logo} alt="logo" className='w-[10rem]' />
+       
 
+        {/* Navigation Links */}
+        <nav className="flex space-x-8 ">
+          {NavbarRoutes.map((route) => (
+            <Link
+              key={route.id}
+              to={route.route}
+              className="flex items-center font-bold  transition duration-300 hover:text-indigo-300 text-[18px]"
+            >
+              <span className="mr-2">{route.icon}</span>
+              <span>{route.name}</span>
+            </Link>
+          ))}
+        </nav>
+
+        {/* Right Section: AddDiary, Posts Count, and Account */}
         <div className="flex items-center space-x-6">
+          {/* Add Diary Button */}
+          <AddDiary />
+
+          {/* Tooltip for Posts Count */}
           <Tooltip
             label={
               loading
@@ -110,18 +145,15 @@ const Navbar = () => {
             }
             aria-label="Posts Count Tooltip"
           >
-            <div className="flex items-center text-gray-700 cursor-pointer dark:text-gray-200">
+            <div className="flex items-center text-white cursor-pointer">
               <FaFire className="mr-1 text-yellow-500" size={20} />
               <span className="text-lg">
                 {loading ? '...' : error ? '!' : postsCount}
               </span>
             </div>
           </Tooltip>
-          
-          <div onClick={toggleHistory} className="cursor-pointer"> 
-            <FaHistory size={20} />
-          </div>
 
+          {/* User Account Image */}
           <AccountImage />
         </div>
       </div>
