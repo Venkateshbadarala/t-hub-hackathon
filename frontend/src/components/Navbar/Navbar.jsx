@@ -114,7 +114,8 @@ const Navbar = () => {
       className="fixed top-0 left-0 right-0 z-50 text-white bg-black shadow-lg"
     >
       <div className="flex items-center justify-between px-8 py-3">
-        <img src={logo} alt="logo" className='w-[10rem]' />
+        {/* <img src={logo} alt="logo" className='w-[10rem]' /> */}
+        <h1 className='text-4xl libre-baskerville-regular-italic'> Emo-diary</h1>
 
         {/* Navigation Links */}
         <nav className="flex space-x-8">
@@ -132,7 +133,7 @@ const Navbar = () => {
 
         {/* Right Section: AddDiary, Posts Count, and Account */}
         <div className="flex items-center space-x-6">
-          <AddDiary />
+         
           
           {/* Doctor Appointment Button */}
           <button onClick={() => navigate('/doctor-booking')} className="flex items-center space-x-2 bg-indigo-600 text-white px-4 py-2 rounded-md transition duration-300 hover:bg-indigo-800">

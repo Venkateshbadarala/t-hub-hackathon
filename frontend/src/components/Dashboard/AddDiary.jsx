@@ -114,7 +114,7 @@ const AddDiary = () => {
       <button onClick={() => setIsmodel(true)} className="flex items-center justify-center gap-2 p-2 text-white bg-blue-500 rounded-md"><TiDocumentAdd /> Add</button>
 
       {ismodel && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 top-[28rem]">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 text-black ">
           <div className="max-w-[60rem] p-6 bg-white rounded-lg shadow-lg relative">
             <button onClick={() => setIsmodel(false)} className="absolute top-4 right-4">
               <RxCross2 size={20} />

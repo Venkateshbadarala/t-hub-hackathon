@@ -6,6 +6,7 @@ import { Button, Spinner, Alert, AlertIcon, AlertTitle, AlertDescription } from 
 import DiaryList from './DiaryList';
 import DiaryModal from './DiaryModal'; 
 import { motion } from 'framer-motion';
+import AddDiary from './AddDiary';
 
 const ViewDiaries = ({ selectedDate }) => {
   const [diaries, setDiaries] = useState([]);
@@ -93,16 +94,29 @@ const ViewDiaries = ({ selectedDate }) => {
 
   return (
     <div className="fixed flex flex-col items-center justify-center p-6 ">
-      <h2 className="mb-6 font-serif text-3xl font-extrabold text-center text-white">E-Diaries List</h2>
+     
 
-      <div className="flex justify-center mb-6">
-        <motion.div className='flex gap-6'>
-          <Button colorScheme="blue" onClick={() => setShowFullHistory(false)} className='font-serif'>
-            View Selected Date
-          </Button>
-          <Button colorScheme="blue" onClick={() => setShowFullHistory(true)} className='font-serif'>
+      <div className="flex gap-[20rem] mb-6 justify-between">
+        <motion.div className='flex  justify-center gap-[31rem]'>
+          <div>
+          <h2 className="mb-6 font-serif text-3xl font-extrabold text-center text-white">E-Diaries List</h2>
+          </div>
+          <div className='flex gap-5'>
+        <div>
+            <AddDiary/>
+          </div>
+          <div>
+            {
+              showFullHistory ? <Button colorScheme="blue" onClick={() => setShowFullHistory(false)} className='font-serif'>
+              View Selected Date
+            </Button> : <Button colorScheme="blue" onClick={() => setShowFullHistory(true)} className='font-serif'>
             View Full History
           </Button>
+            }
+          </div>
+          </div>
+          
+          
         </motion.div>
       </div>
 

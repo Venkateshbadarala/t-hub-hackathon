@@ -10,7 +10,7 @@ import Likes from './components/Dashboard/Like';
 import { HistoryProvider } from './context/useHistory';
 import PregisterForm from './components/Forms/PRegister';
 import PloginForm from './components/Forms/Plogin';
-import DoctorDashboard from './components/Dashboard/PdashBoard';
+import DoctorDashboard from './components/Dashboard/PDashBoard';
 import DoctorBooking from './components/DoctorAppointment';
 
 

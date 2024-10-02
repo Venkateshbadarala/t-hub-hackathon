@@ -104,7 +104,7 @@ const EmotionalGraph = () => {
   }, []);
 
   return (
-    <Box w="400px" h="300px" mt={8} p={2} bg="white" rounded="md" shadow="md">
+    <Box w="350px" h="300px" mt={8} p={1} bg="white" rounded="md" shadow="md">
       <Text fontSize="xl" fontWeight="bold" textAlign="center" mb={2}>
         Emotion Over Time
       </Text>

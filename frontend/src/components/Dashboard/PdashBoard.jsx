@@ -1,29 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { FaCalendarAlt, FaClock, FaCheck, FaTimes } from 'react-icons/fa';
+// src/components/DoctorDashboard.jsx
+import React, { useState } from 'react';
+import { FaCalendarAlt, FaClock, FaCheck, FaTimes, FaUserCircle } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { db } from '../../firebase-config';
-import { collection, getDocs } from 'firebase/firestore'; 
+const DoctorDashboard = () => {
+  const [appointments, setAppointments] = useState([
+    { id: 1, patient: "Alice Johnson", date: "2024-10-05", time: "10:00 AM", status: "pending" },
+    { id: 2, patient: "Bob Smith", date: "2024-10-06", time: "2:00 PM", status: "pending" },
+    { id: 3, patient: "Carol Williams", date: "2024-10-07", time: "11:30 AM", status: "pending" },
+  ]);
 
-const DoctorDashboard = ({ doctorId }) => {
-  const [appointments, setAppointments] = useState([]);
-
-  // Fetch appointments for the doctor
-  const fetchAppointments = async () => {
-    try {
-        const appointmentsCollection = collection(db, `doctors/${doctorId}/appointments`);
-        const appointmentsSnapshot = await getDocs(appointmentsCollection);
-        const appointmentsList = appointmentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setAppointments(appointmentsList);
-      } catch (error) {
-        console.error('Error fetching appointments:', error);
-      }
-    
-  };
-
-  // Fetch appointments on component mount
-  useEffect(() => {
-    fetchAppointments();
-  }, []);
+  // Sample data for patients
+  const [patients] = useState([
+    { id: 1, name: "Alice Johnson", age: 32, lastVisit: "2024-09-20" },
+    { id: 2, name: "Bob Smith", age: 45, lastVisit: "2024-09-25" },
+    { id: 3, name: "Carol Williams", age: 28, lastVisit: "2024-09-30" },
+  ]);
 
   // Handle approving or denying appointments
   const handleAppointment = (id, action) => {
@@ -62,16 +54,17 @@ const DoctorDashboard = ({ doctorId }) => {
                     transition={{ duration: 0.3 }}
                     className="flex items-center justify-between bg-gray-700 p-4 rounded-lg"
                   >
-                    
+                    {/* Appointment Details */}
                     <div>
-                      <p className="font-semibold text-lg">{appointment.patientName}</p>
+                      <p className="font-semibold text-lg">{appointment.patient}</p>
                       <div className="flex items-center text-sm text-gray-400">
                         <FaCalendarAlt className="mr-2 h-4 w-4" />
-                        {appointment.appointmentDate}
+                        {appointment.date}
                         <FaClock className="ml-4 mr-2 h-4 w-4" />
                         {appointment.time}
                       </div>
                     </div>
+                    {/* Action Buttons */}
                     <div className="flex items-center space-x-2">
                       {appointment.status === 'pending' ? (
                         <>
@@ -101,6 +94,39 @@ const DoctorDashboard = ({ doctorId }) => {
                   </motion.li>
                 ))}
               </ul>
+            </div>
+          </section>
+
+          {/* Patient Details */}
+          <section>
+            <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
+              <h2 className="text-xl font-semibold mb-4">Patient Details</h2>
+              <div className="space-y-4">
+                {patients.map(patient => (
+                  <div key={patient.id} className="flex items-center justify-between bg-gray-700 p-4 rounded-lg">
+                    {/* Patient Info */}
+                    <div className="flex items-center space-x-4">
+                      {/* User Avatar */}
+                      <div className="relative">
+                        <img
+                          src={`https://i.pravatar.cc/100?u=${patient.name}`}
+                          alt={patient.name}
+                          className="h-12 w-12 rounded-full object-cover"
+                        />
+                        <FaUserCircle className="absolute -bottom-1 -right-1 text-blue-500 h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-lg">{patient.name}</p>
+                        <p className="text-sm text-gray-400">Age: {patient.age}</p>
+                      </div>
+                    </div>
+                    {/* Last Visit */}
+                    <div className="text-sm text-gray-400">
+                      Last Visit: {patient.lastVisit}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </section>
         </div>
